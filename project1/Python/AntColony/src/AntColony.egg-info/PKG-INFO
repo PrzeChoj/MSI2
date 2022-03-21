@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: AntColony
+Version: 0.1
+Summary: Ant Colony for solving CVRP
+Home-page: https://github.com/PrzeChoj/MSI2
+Author: Przemysław Adam Chojecki
+Author-email: premysl.choj@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/PrzeChoj/MSI2/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+Wont exist
+

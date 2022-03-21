@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+src/AntColony/AntColony.py
+src/AntColony/__init__.py
+src/AntColony.egg-info/PKG-INFO
+src/AntColony.egg-info/SOURCES.txt
+src/AntColony.egg-info/dependency_links.txt
+src/AntColony.egg-info/requires.txt
+src/AntColony.egg-info/top_level.txt
