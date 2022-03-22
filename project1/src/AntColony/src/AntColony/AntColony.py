@@ -5,10 +5,14 @@ from collections import Counter
 
 from sklearn.cluster import KMeans as kmeans
 
-rng = np.random.default_rng()
-
 
 class AntColony:
+    class Solution:
+        def __init__(self, path, cost, trucks):
+            self.path = path
+            self.cost = cost
+            self.trucks = trucks
+
     def __init__(self, number_of_ants=None, alpha=1, beta=1,
                  starting_pheromone=1, Q=1, ro=0.9, print_progress=False):
         if number_of_ants is not None and number_of_ants <= 0:
@@ -66,7 +70,9 @@ class AntColony:
         self.s_max = s_max
         self.number_of_cars = number_of_cars
 
-    def restart(self):
+        self.best_solutions = []
+
+    def restart(self):  # IF YOU MODIFY THIS FUNCTION, ALSO MODIFY THE ONE IN AntColony_Abstract_Modification
         self.pheromone_restart()
         self.calculate_distance_matrix()
         self.calculate_transition_matrix()
@@ -74,6 +80,8 @@ class AntColony:
         self.best_cost = np.inf
         self.best_path = None
         self.best_number_of_cycles = None
+        self.now_iter = 0
+        self.iters_done = 0
 
     def calculate_distance_matrix(self):
         self.distance_matrix = np.zeros((self.problem_size, self.problem_size))
@@ -82,15 +90,28 @@ class AntColony:
             for j in range(i + 1, self.problem_size):  # only above the diagonal
                 d = np.linalg.norm(self.coordinates[i, :] - self.coordinates[j, :])
                 self.distance_matrix[i, j] = d
-                #self.distance_matrix[j, i] = d  # in this loop only the obove diagonal are filled
+                # in this loop only the places above diagonal are filled
 
         self.distance_matrix += self.distance_matrix.T  # fill below diagonal
 
-        self.distance_matrix_to_warehouse = self.distance_matrix + self.distance_matrix[0]  # matrix of the distance to warehouse throught other node
+        # check if there is a 0 - distance pair
+        modified_distance_matrix = self.distance_matrix + np.eye(self.problem_size)
+        if modified_distance_matrix.min() == 0.0:
+            if self.print_progress:
+                print("There is a pair of destinations with the same coordinates:")
+            for i in range(self.problem_size):
+                for j in range(self.problem_size):
+                    if np.all(self.coordinates[i] == self.coordinates[j]) and i != j:
+                        self.distance_matrix[i, j] += 0.001
+                        if self.print_progress:
+                            print("{}, {}".format(i, j))
+
+        # matrix of the distance to warehouse throughout other node
+        self.distance_matrix_to_warehouse = self.distance_matrix + self.distance_matrix[0]
 
     def calculate_transition_matrix(self):
         # self.T_P is non standardize Probability
-        modified_distance_matrix = self.distance_matrix + np.eye(self.problem_size)  # diagonal will later be set to 0
+        modified_distance_matrix = self.distance_matrix + np.eye(self.problem_size)
         self.T_P = (self.pheromone_matrix ** self.alpha) * ((1 / modified_distance_matrix) ** self.beta)
 
         self.T_P = (self.T_P.T / self.T_P.sum(axis=1)).T  # T_P is matrix of probabilities
@@ -198,11 +219,13 @@ class AntColony:
 
         i_min_cost = np.argmin(costs)
         if costs[i_min_cost] < self.best_cost:
+            self.best_solutions.append(self.Solution(paths[i_min_cost], costs[i_min_cost], num_of_cycles[i_min_cost]))
+
             self.best_path = paths[i_min_cost]
             self.best_cost = costs[i_min_cost]
             self.best_number_of_cycles = num_of_cycles[i_min_cost]
             if self.print_progress:
-                print("New best solution in {} iteration: cost = {:.5f} and uses {} trucks".format(iteration,
+                print("New best solution in {} iteration: cost = {:.3f} and uses {} trucks".format(iteration,
                                                                                                    self.best_cost,
                                                                                                    self.best_number_of_cycles))
 
@@ -217,9 +240,11 @@ class AntColony:
 
         self.uniform_drawn = self.rng.uniform(size=(max_iter, self.number_of_ants, 2 * self.problem_size))
 
+        self.now_iter = 0
         for i in range(max_iter):
-            self.now_iter = i
+            self.iters_done += 1
             self.single_iteration(i)
+            self.now_iter += 1
 
         # TODO - Czy udało się znaleść rozwiązanie z dobrą liczbą samochodów?
 
@@ -234,6 +259,9 @@ class AntColony_Abstract_Modification(AntColony):
         self.best_cost = np.inf
         self.best_path = None
         self.best_cycles_number = None
+
+        self.now_iter = 0
+        self.iters_done = 0
 
     @abstractmethod
     def calculate_legal_edges(self):
