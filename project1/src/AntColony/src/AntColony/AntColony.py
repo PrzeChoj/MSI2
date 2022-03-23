@@ -6,6 +6,123 @@ from collections import Counter
 from sklearn.cluster import KMeans as kmeans
 
 
+class Greedy:
+    def __init__(self, print_progress=False):
+        self.print_progress = print_progress
+        self.iters_done = None
+
+    def set_problem(self, coordinates, request, capacity, s_max, number_of_cars):
+        if coordinates.shape[1] != 2:
+            raise Exception("coordinates are not in IR^2")
+        if request[0] != 0:
+            print("Adding 0 as technical request for warehouse")
+            request = np.insert(request, 0, 0)
+        if coordinates.shape[0] != request.shape[0]:
+            raise Exception("Different number of coordinates and requests")
+        if np.sum(request <= 0) > 1:
+            raise Exception("There is non positive request, other than the technical one at the warehouse")
+        if np.any(request > capacity):
+            raise Exception("There is request bigger than capacity. This problem is unsolvable!")
+        if number_of_cars < 0:
+            raise Exception("number_of_cars parameter has to be positive")
+
+        self.problem_size = coordinates.shape[0]
+        self.coordinates = coordinates
+        self.request = request
+        self.capacity = capacity
+
+        self.calculate_distance_matrix()
+
+        if np.any(self.distance_matrix[0] * 2 > s_max):
+            raise Exception(
+                "There is distance bigger than max_s / 2. This problem is unsolvable! Check antColony.distance_matrix")
+
+        self.s_max = s_max
+
+        self.restart()
+
+    def restart(self):
+        self.best_cost = np.inf
+        self.best_path = [0]
+        self.best_number_of_cycles = 0
+
+    def calculate_distance_matrix(self):
+        self.distance_matrix = np.zeros((self.problem_size, self.problem_size))
+
+        for i in range(0, self.problem_size):
+            for j in range(i + 1, self.problem_size):  # only above the diagonal
+                d = np.linalg.norm(self.coordinates[i, :] - self.coordinates[j, :])
+                self.distance_matrix[i, j] = d
+                # in this loop only the places above diagonal are filled
+
+        self.distance_matrix += self.distance_matrix.T  # fill below diagonal
+
+        # check if there is a 0 - distance pair
+        modified_distance_matrix = self.distance_matrix + np.eye(self.problem_size)
+        if modified_distance_matrix.min() == 0.0:
+            if self.print_progress:
+                print("There is a pair of destinations with the same coordinates:")
+            for i in range(self.problem_size):
+                for j in range(self.problem_size):
+                    if np.all(self.coordinates[i] == self.coordinates[j]) and i != j:
+                        self.distance_matrix[i, j] += 0.001
+                        if self.print_progress:
+                            print("{}, {}".format(i, j))
+
+        # matrix of the distance to warehouse throughout other node
+        self.distance_matrix_to_warehouse = self.distance_matrix + self.distance_matrix[0]
+
+    def optimize(self):
+        capacity_left = self.capacity
+        dist_from_warehouse = 0
+        node = self.best_path[-1]
+        while len(self.best_path) - self.best_number_of_cycles < self.problem_size:
+            possible_nodes = self.get_possible_nodes(self.best_path, capacity_left, dist_from_warehouse)
+            if np.any(possible_nodes):
+                next_node = np.arange(self.problem_size)[possible_nodes][self.distance_matrix[node, possible_nodes].argmin()]
+            else:
+                raise Exception("There is nowhere to go. This should never happen")
+            self.best_path.append(next_node)
+            nextnode = self.best_path[-1]
+            dist_from_warehouse += self.distance_matrix[node, nextnode]
+            if nextnode == 0:
+                self.best_number_of_cycles += 1
+                capacity_left = self.capacity
+                dist_from_warehouse = 0
+            else:
+                capacity_left -= self.request[nextnode]
+
+            node = nextnode
+
+        self.best_path.append(0)
+        self.best_number_of_cycles += 1
+        self.best_cost = self.calculate_cost(self.best_path)
+
+
+    def get_possible_nodes(self, visited_nodes, capacity_left, dist_from_warehouse):
+        node = visited_nodes[-1]
+
+        possible_nodes = np.ones(self.problem_size).astype(bool)  # (True, True, ..., True)
+
+        possible_nodes[visited_nodes] = False
+
+        possible_nodes[capacity_left < self.request] = False
+
+        possible_nodes[dist_from_warehouse + self.distance_matrix_to_warehouse[node] > self.s_max] = False
+
+        if not np.any(np.array(possible_nodes)) and node != 0:
+            possible_nodes[0] = True  # If I cannot go anywhere, I'll go to the warehouse
+
+        return possible_nodes
+
+    def calculate_cost(self, path):
+        cost_sum = 0
+        for i in range(len(path) - 1):
+            cost_sum += self.distance_matrix[path[i], path[i + 1]]
+        return cost_sum
+
+
+
 class AntColony:
     class Solution:
         def __init__(self, path, cost, trucks):
@@ -60,7 +177,7 @@ class AntColony:
 
         self.restart()
 
-        if self.number_of_ants is None:
+        if self.number_of_ants is None:  # other numbers of ants is set in __init__
             self.number_of_ants = 2 * self.problem_size
 
         if np.any(self.distance_matrix[0] * 2 > s_max):
@@ -116,7 +233,7 @@ class AntColony:
 
         self.T_P = (self.T_P.T / self.T_P.sum(axis=1)).T  # T_P is matrix of probabilities
 
-        self.T_P = self.T_P + 0.01 * np.ones_like(self.T_P)
+        self.T_P = self.T_P + 0.01 * np.ones_like(self.T_P)  # modification for not relying only on pheromone
 
         np.fill_diagonal(self.T_P, 0)
 
@@ -127,13 +244,13 @@ class AntColony:
     def ant_find_path(
             self):  # return (list of nodes, number of times to start from warehouse - number of 0 in list of nodes minus 1 - number of ant_find_circle() calls)
         visited_nodes = [0]  # start from warehouse
-        number_of_cicles = 0
+        number_of_cycles = 0
         while len(
-                visited_nodes) - number_of_cicles < self.problem_size:  # in visited_nodes should be [0,1,...,self.problem_size] and additionally number_of_cicles zeros
-            number_of_cicles += 1
+                visited_nodes) - number_of_cycles < self.problem_size:  # in visited_nodes should be [0,1,...,self.problem_size] and additionally number_of_cycles zeros
+            number_of_cycles += 1
             visited_nodes = self.ant_find_circle(visited_nodes)
 
-        return visited_nodes, number_of_cicles
+        return visited_nodes, number_of_cycles
 
     def ant_find_circle(self, visited_nodes):
         if visited_nodes is None or len(visited_nodes) == 0 or visited_nodes[-1] != 0:
@@ -159,7 +276,7 @@ class AntColony:
         return visited_nodes
 
     def ant_make_move(self, visited_nodes, capacity_left,
-                      dist_from_warehouse):  # wylosuj z rozkladu self.T_P[dopuszczalne]
+                      dist_from_warehouse):  # Draw a node from probability according to self.T_P[possible_nodes]
         node = visited_nodes[-1]
         if node == 0 and dist_from_warehouse != 0:
             raise Exception("ant is in warehouse, but the dist_from_warehouse is not 0")
@@ -173,11 +290,14 @@ class AntColony:
 
         my_cum_sum = np.cumsum(self.T_P[node, possible_nodes])
         c = my_cum_sum[-1]
+        if c == 0:
+            raise Exception("The probability is 0 :(")
 
         u = self.uniform_drawn[self.now_iter, self.ant_now, len(visited_nodes)] * c
 
-        return np.where(possible_nodes)[0][
-            np.where(u < my_cum_sum)[0][0]]  # EXP: np.where(u < my_cum_sum) == ([3,4,5],) # so the 3 was drawn
+        return np.where(possible_nodes)[0][np.where(u < my_cum_sum)[0][0]]  # EXP: np.where(u < my_cum_sum) == ([3,4,5],) # so the 3 was drawn
+
+
 
     def get_possible_nodes(self, visited_nodes, capacity_left, dist_from_warehouse):
         node = visited_nodes[-1]
@@ -186,7 +306,7 @@ class AntColony:
 
         possible_nodes[visited_nodes] = False
 
-        possible_nodes[0] = True  # jesli nawet jesteśmy w 0, to wtedy self.T_P [0,0] = 0, więc tu może być True
+        possible_nodes[0] = True  # If we are in 0, then still self.T_P [0,0] = 0, so this can stay True
 
         possible_nodes[capacity_left < self.request] = False
 
@@ -232,7 +352,7 @@ class AntColony:
         self.pheromone_modify(paths, costs)
         self.calculate_transition_matrix()
 
-    def optimize(self, max_iter, print_progress=False, rng_seed=None, restart=True):
+    def optimize(self, max_iter, print_progress=False, rng_seed=None, restart=True, check_cars=True):
         self.print_progress = print_progress
         self.rng = np.random.default_rng(rng_seed)
         if restart:
@@ -246,14 +366,16 @@ class AntColony:
             self.single_iteration(i)
             self.now_iter += 1
 
-        # TODO - Czy udało się znaleść rozwiązanie z dobrą liczbą samochodów?
+        if check_cars:
+            # TODO - Czy udało się znaleść rozwiązanie z dobrą liczbą samochodów?
+            pass
 
 
 class AntColony_Abstract_Modification(AntColony):
     def restart(self):
         self.pheromone_restart()
         self.calculate_distance_matrix()
-        self.calculate_legal_edges()  # this is added in _Reduced version of restart() function
+        self.calculate_legal_edges()  # this is added in modified version of restart() function
         self.calculate_transition_matrix()
 
         self.best_cost = np.inf
@@ -290,30 +412,148 @@ class AntColony_Reduced(AntColony_Abstract_Modification):
         self.legal_edges[0, 0] = False
 
 
-class AntColony_Divided(AntColony_Abstract_Modification):
+class AntColony_Divided_Cluster(AntColony_Abstract_Modification):
+    # This is just the class for optimizing the single cluster of Divided modification. The interface for using the Divided modification is in AntColony_Divided class.
+    # This class will get all information about all the nodes, but will only work for the subset of them
+
+    def set_problem(self, coordinates, request, capacity, s_max, number_of_cars,
+                    subset_of_nodes_to_solve):
+        if len(subset_of_nodes_to_solve) >= coordinates.shape[0]:
+            raise Exception("There is too much nodes to be solved")
+        if np.any(subset_of_nodes_to_solve == 0):
+            raise Exception("There is the warehouse in subsets to optimize")
+
+        self.subset_of_nodes_to_solve = subset_of_nodes_to_solve
+        self.problem_size_divided = len(subset_of_nodes_to_solve)
+        super(AntColony_Divided_Cluster, self).set_problem(coordinates, request, capacity, s_max, number_of_cars)
+
     def calculate_legal_edges(self):
-        coordinates_no_warehouse = self.coordinates[1:]
+        self.legal_edges = np.zeros((self.problem_size, self.problem_size), dtype=bool)
 
-        number_of_clusters = math.floor(math.log(len(coordinates_no_warehouse)))
-        kmeans_model = kmeans(n_clusters=number_of_clusters,
-                              random_state=0).fit(coordinates_no_warehouse)
+        # it is not in np, so it is not efficient, but it is only run one time per restart, not in a loop
+        for i in self.subset_of_nodes_to_solve:
+            for j in self.subset_of_nodes_to_solve:
+                self.legal_edges[i, j] = True
 
-        self.kmeans_model = kmeans_model
+        # one can always go to and from the warehouse
+        self.legal_edges[0, self.subset_of_nodes_to_solve] = True
+        self.legal_edges[self.subset_of_nodes_to_solve, 0] = True
+        self.legal_edges[0, 0] = False
+
+    def ant_find_path(self):
+        visited_nodes = [0]
+        number_of_cycles = 0
+        while len(
+                visited_nodes) - number_of_cycles < self.problem_size_divided + 1:  # the problem_size changed to problem_size_divided from the basic version of algorithm; +1, coz the warehouse
+            number_of_cycles += 1
+            visited_nodes = self.ant_find_circle(visited_nodes)
+
+        return visited_nodes, number_of_cycles
+
+
+class AntColony_Divided(AntColony):  # The same interface as AntColony, but those are only workarounds
+    def set_problem(self, coordinates, request, capacity, s_max, number_of_cars):
+        if coordinates.shape[1] != 2:
+            raise Exception("coordinates are not in IR^2")
+        if request[0] != 0:
+            print("Adding 0 as technical request for warehouse")
+            request = np.insert(request, 0, 0)
+        if coordinates.shape[0] != request.shape[0]:
+            raise Exception("Different number of coordinates and requests")
+        if np.sum(request <= 0) > 1:
+            raise Exception("There is non positive request, other than the technical one at the warehouse")
+        if np.any(request > capacity):
+            raise Exception("There is request bigger than capacity. This problem is unsolvable!")
+        if number_of_cars < 0:
+            raise Exception("number_of_cars parameter has to be positive")
+
+        self.problem_size = coordinates.shape[0]
+        self.coordinates = coordinates
+        self.request = request
+        self.capacity = capacity
+
+        # No restart()
+
+        # no ants
+
+        self.calculate_distance_matrix()
+
+        if np.any(self.distance_matrix[0] * 2 > s_max):
+            raise Exception(
+                "There is distance bigger than max_s / 2. This problem is unsolvable! Check antColony.distance_matrix")
+
+        self.s_max = s_max
+        self.number_of_cars = number_of_cars
+
+        self.restart()
+
+    def restart(self):
+        self.best_solutions = []
+
+        self.calculate_kmeans_model()
+
+        self.best_cost = np.inf
+        self.best_path = np.array([])
+        self.best_path = self.best_path.astype(int)
+        self.best_number_of_cycles = None
+
+        self.best_path_clusters = [None for i in range(self.number_of_clusters)]
+        self.best_cost_clusters = [None for i in range(self.number_of_clusters)]
+        self.best_number_of_cycles_clusters = [None for i in range(self.number_of_clusters)]
+
+        self.iters_done = 0
+
+    def calculate_kmeans_model(self):
+        coordinates_no_warehouse = self.coordinates[1:]  # the warehouse will not be considered for clusters
+
+        self.number_of_clusters = math.floor(math.log(len(coordinates_no_warehouse)))
+        self.kmeans_model = kmeans(n_clusters=self.number_of_clusters,
+                                   random_state=0).fit(coordinates_no_warehouse)
+
+        self.clusters = [np.where(self.kmeans_model.labels_ == i)[0] + 1  # +1, coz the warehouse is not in kmeans model
+                         for i in range(self.number_of_clusters)]
 
         if self.print_progress:
             counter = Counter(self.kmeans_model.labels_)
-            licznosci = [x[1] for x in counter.items()]
-            print("Użyto {} klastrów w licznosciach {}".format(number_of_clusters, licznosci))
+            counts = [x[1] for x in counter.items()]
+            print("{} clusters used with counts {}".format(self.number_of_clusters, counts))
 
-        self.legal_edges = np.zeros_like(self.distance_matrix, dtype=bool)
+    def cluster_solve(self, i, max_iter, rng_seed, check_cars):
+        cluster_solver = AntColony_Divided_Cluster(self.number_of_ants, self.alpha, self.beta, self.starting_pheromone,
+                                                   self.Q, self.ro, self.print_progress)
+        cluster_solver.set_problem(self.coordinates, self.request, self.capacity, self.s_max, self.number_of_cars,
+                                   self.clusters[i])
 
-        for i in range(1, self.problem_size):
-            for j in range(i+1, self.problem_size):
-                if kmeans_model.labels_[i-1] == kmeans_model.labels_[j-1]:
-                    self.legal_edges[i, j] = True
-                    self.legal_edges[j, i] = True
+        cluster_solver.optimize(max_iter, print_progress=self.print_progress, restart=True, rng_seed=rng_seed,
+                                check_cars=check_cars)
 
-        # one can always go to and from the warehouse
-        self.legal_edges[:, 0] = True
-        self.legal_edges[0, :] = True
-        self.legal_edges[0, 0] = False
+        self.best_path_clusters[i] = cluster_solver.best_path
+        self.best_cost_clusters[i] = cluster_solver.best_cost
+        self.best_number_of_cycles_clusters[i] = cluster_solver.best_number_of_cycles
+
+    def optimize(self, max_iter, print_progress=False, rng_seed=None, restart=True, check_cars=True):
+        self.print_progress = print_progress
+        self.rng = np.random.default_rng(rng_seed)
+        if restart:
+            self.restart()
+
+        for i in range(self.number_of_clusters):
+            if print_progress:
+                print("\nOptimization of {}th cluster:".format(i))
+            self.cluster_solve(i, max_iter, rng_seed, check_cars)
+
+        self.best_cost = sum(self.best_cost_clusters)
+        self.best_number_of_cycles = sum(self.best_number_of_cycles_clusters)
+
+        for i in range(self.number_of_clusters):
+            path = np.array(self.best_path_clusters[i][0:-1])
+            path = path.astype(int)
+            self.best_path = np.concatenate((self.best_path, np.array(path)))
+
+        self.best_path = np.append(self.best_path, 0)
+
+        self.iters_done += max_iter
+
+        if check_cars:
+            # TODO - Czy udało się znaleść rozwiązanie z dobrą liczbą samochodów?
+            pass
