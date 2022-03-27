@@ -12,7 +12,9 @@ class Greedy:
         self.print_warnings = print_warnings
         self.iters_done = None
 
-    def set_problem(self, coordinates, request, capacity, s_max, number_of_cars):
+    def set_problem(self, s_max, number_of_cars, problem):
+        coordinates, request, capacity = problem.get_data()
+
         if coordinates.shape[1] != 2:
             raise Exception("coordinates are not in IR^2")
         if request[0] != 0:
@@ -99,6 +101,9 @@ class Greedy:
         self.best_number_of_cycles += 1
         self.best_cost = self.calculate_cost(self.best_path)
 
+        if self.print_warnings:
+            print()
+
     def get_possible_nodes(self, visited_nodes, capacity_left, dist_from_warehouse):
         node = visited_nodes[-1]
 
@@ -155,7 +160,9 @@ class AntColony:
         self.ro = ro
         self.print_warnings = print_warnings
 
-    def set_problem(self, coordinates, request, capacity, s_max, number_of_cars):
+    def set_problem(self, s_max, number_of_cars, problem):
+        coordinates, request, capacity = problem.get_data()
+
         if coordinates.shape[1] != 2:
             raise Exception("coordinates are not in IR^2")
         if request[0] != 0:
@@ -364,6 +371,9 @@ class AntColony:
         if restart:
             self.restart()
 
+        if self.print_progress:
+            print("Optimization with rng_seed = {}".format(rng_seed))
+
         self.draw_numbers()
 
         self.now_iter = 0
@@ -386,6 +396,9 @@ class AntColony:
         if check_cars:
             # TODO - Czy udało się znaleść rozwiązanie z dobrą liczbą samochodów?
             pass
+
+        if print_progress:
+            print()
 
     def draw_numbers(self):
         self.uniform_drawn = self.rng.uniform(size=(self.max_iter, self.number_of_ants, 2 * self.problem_size + 1))
@@ -441,9 +454,10 @@ class AntColony_Divided_Cluster(AntColony_Abstract_Modification):
     # This is just the class for optimizing the single cluster of Divided modification. The interface for using the Divided modification is in AntColony_Divided class.
     # This class will get all information about all the nodes, but will only work for the subset of them
 
-    def set_problem(self, coordinates, request, capacity, s_max, number_of_cars):
+    def set_problem(self, s_max, number_of_cars, problem):
+
         self.subset_of_nodes_to_solve = None
-        super(AntColony_Divided_Cluster, self).set_problem(coordinates, request, capacity, s_max, number_of_cars)
+        super(AntColony_Divided_Cluster, self).set_problem(s_max, number_of_cars, problem)
 
     def add_subset(self, subset_of_nodes_to_solve):
         if len(subset_of_nodes_to_solve) >= self.coordinates.shape[0]:
@@ -496,7 +510,6 @@ class AntColony_Divided_Cluster(AntColony_Abstract_Modification):
 
     def draw_numbers(self):
         self.uniform_drawn = self.rng.uniform(size=(self.max_iter, self.number_of_ants, 2 * self.problem_size_divided + 1))
-        print("Wylosowano z rozmiarem {}".format(self.problem_size_divided))
 
 
 class AntColony_Divided(AntColony):  # The same interface as AntColony, but those are only workarounds
@@ -506,7 +519,10 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
                                                 print_warnings=print_warnings)
         self.name = "Divided"
 
-    def set_problem(self, coordinates, request, capacity, s_max, number_of_cars):
+    def set_problem(self, s_max, number_of_cars, problem):
+        self.problem = problem
+        coordinates, request, capacity = problem.get_data()
+
         if coordinates.shape[1] != 2:
             raise Exception("coordinates are not in IR^2")
         if request[0] != 0:
@@ -576,7 +592,7 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
     def set_cluster(self):
         self.cluster_solver = AntColony_Divided_Cluster(self.number_of_ants, self.alpha, self.beta,
                                                         self.starting_pheromone, self.Q, self.ro, self.print_warnings)
-        self.cluster_solver.set_problem(self.coordinates, self.request, self.capacity, self.s_max, self.number_of_cars)
+        self.cluster_solver.set_problem(self.s_max, self.number_of_cars, self.problem)
 
     def cluster_solve(self, i, max_iter, rng_seed, check_cars, max_time):
         self.cluster_solver.add_subset(self.clusters[i])
@@ -605,10 +621,11 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
 
         self.iters_done = max_iter
 
+        max_time_cluster = [max_time / (self.problem_size - 1) * len(x) for x in self.clusters]
         for i in range(self.number_of_clusters):
             if print_progress:
-                print("\nOptimization of cluster {}:".format(i+1))
-            self.cluster_solve(i, max_iter, rng_seed, check_cars, max_time/self.number_of_clusters)
+                print("\nOptimization of cluster {} with {} nodes:".format(i+1, len(self.clusters[i])))
+            self.cluster_solve(i, max_iter, rng_seed, check_cars, max_time_cluster[i])
 
         self.best_cost = sum(self.best_cost_clusters)
         self.best_number_of_cycles = sum(self.best_number_of_cycles_clusters)
@@ -619,6 +636,9 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
             self.best_path = np.concatenate((self.best_path, np.array(path)))
 
         self.best_path = np.append(self.best_path, 0)
+
+        if print_progress:
+            print()
 
         if check_cars:
             # TODO - Czy udało się znaleść rozwiązanie z dobrą liczbą samochodów?
