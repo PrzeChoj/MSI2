@@ -3,7 +3,15 @@ import networkx as nx
 import random
 import matplotlib.pyplot as plt
 import ast as _ast
+import logging
+import re
+import os
 
+from sys import maxsize
+
+np.set_printoptions(suppress=True,  # no scientific notation
+                    threshold=maxsize,  # logging the whole np.arrays
+                    linewidth=np.inf)  # one line for vectors
 
 def pos_from_coordinates(coordinates):
     pos = {}
@@ -69,7 +77,31 @@ def plot_4_solutions(antColony1, antColony2, antColony3, antColony4,
         fig.savefig(save_file)
 
 def save_to_file(antColont, file):
-    pass
+    # we assume the "logs" folder already exists
+    try:
+        pattern = re.compile("\/[^\/]*$") # find the moment where the folder name ends and file name starts
+        pattern_search = pattern.search(file)
+        os.mkdir(file[0:pattern_search.start()])
+    except:
+        pass # folder already exists
+
+    with open(file, 'w') as myfile:
+        myfile.write("best_cost = {}".format(antColont.best_cost))
+        myfile.write("\nbest_number_of_cycles = {}".format(antColont.best_number_of_cycles))
+        myfile.write("\nbest_path = {}".format(antColont.best_path))
+        myfile.write("\n")
+
+        if antColont.name != "Greedy":
+            myfile.write("\niters_done = {}".format(antColont.iters_done))
+            myfile.write("\nalpha = {}".format(antColont.alpha))
+            myfile.write("\nbeta = {}".format(antColont.beta))
+            myfile.write("\ncars_penalty = {}".format(antColont.cars_penalty))
+            myfile.write("\nnumber_of_ants = {}".format(antColont.number_of_ants))
+            myfile.write("\nnumber_of_cars = {}".format(antColont.number_of_cars))
+            myfile.write("\nQ = {}".format(antColont.Q))
+            myfile.write("\nro = {}".format(antColont.ro))
+            myfile.write("\ntime_of_optimization = {}".format(antColont.time_of_optimization))
+            myfile.write("\n")
 
 def args_to_dict(args, known_names, specials=None, split='=', # copied from cocoex; usefun in script.py
                  print=lambda *args, **kwargs: None):

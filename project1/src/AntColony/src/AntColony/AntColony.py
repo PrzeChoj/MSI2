@@ -639,6 +639,8 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
         if self.iters_done > self.cluster_solver.now_iter:
             self.iters_done = self.cluster_solver.now_iter
 
+        self.time_of_optimization += self.cluster_solver.time_of_optimization
+
     def optimize(self, max_iter=None, print_progress=False, rng_seed=None, restart=True, check_cars=True, max_time=None):
         if max_time is None:
             max_time = 60 * 60  # an hour
@@ -652,6 +654,7 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
             self.restart()
 
         self.iters_done = max_iter
+        self.time_of_optimization = 0
 
         cluster_percent = np.array([len(x) / (self.problem_size-1) for x in self.clusters])
         max_time_cluster = max_time * cluster_percent
