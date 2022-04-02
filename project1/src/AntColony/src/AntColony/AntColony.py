@@ -18,7 +18,8 @@ class Greedy:
         if coordinates.shape[1] != 2:
             raise Exception("coordinates are not in IR^2")
         if request[0] != 0:
-            print("Adding 0 as technical request for warehouse")
+            if self.print_warnings:
+                print("Adding 0 as technical request for warehouse")
             request = np.insert(request, 0, 0)
         if coordinates.shape[0] != request.shape[0]:
             raise Exception("Different number of coordinates and requests")

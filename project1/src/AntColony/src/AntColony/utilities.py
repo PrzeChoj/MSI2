@@ -2,6 +2,7 @@ import numpy as np
 import networkx as nx
 import random
 import matplotlib.pyplot as plt
+import ast as _ast
 
 
 def pos_from_coordinates(coordinates):
@@ -66,3 +67,39 @@ def plot_4_solutions(antColony1, antColony2, antColony3, antColony4,
 
     if save_file is not None:
         fig.savefig(save_file)
+
+def save_to_file(antColont, file):
+    pass
+
+def args_to_dict(args, known_names, specials=None, split='=', # copied from cocoex; usefun in script.py
+                 print=lambda *args, **kwargs: None):
+    def eval_value(value):
+        try:
+            return _ast.literal_eval(value)
+        except ValueError:
+            return value
+    res = {}
+    for arg in args:
+        name, value = arg.split(split)
+        # what remains to be done is to verify name,
+        # compute non-string value, and assign res[name] = value
+        if specials and name in specials:
+            if name == 'batch':
+                print('batch:')
+                for k, v in zip(specials['batch'].split('/'), value.split('/')):
+                    res[k] = int(v)  # batch accepts only int
+                    print(' ', k, '=', res[k])
+                continue  # name is processed
+            else:
+                raise ValueError(name, 'is unknown special')
+        for known_name in known_names if known_names is not None else [name]:
+            # check that name is an abbreviation of known_name and unique in known_names
+            if known_name.startswith(name) and (
+                        sum([other.startswith(name)
+                             for other in known_names or [names]]) == 1):
+                res[known_name] = eval_value(value)
+                print(known_name, '=', res[known_name])
+                break  # name == arg.split()[0] is processed
+        else:
+            raise ValueError(name, 'not found or ambiguous in `known_names`')
+    return res
