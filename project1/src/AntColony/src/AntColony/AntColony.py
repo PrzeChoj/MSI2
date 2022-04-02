@@ -134,8 +134,9 @@ class AntColony:
             self.cost = cost
             self.trucks = trucks
 
-    def __init__(self, number_of_ants=None, alpha=1, beta=1,
-                 starting_pheromone=1, Q=1, ro=0.9, print_warnings=False):
+    def __init__(self, number_of_ants=None, alpha=2, beta=3.5,
+                 starting_pheromone=1, Q=1, ro=0.9, cars_penalty=0.1,
+                 print_warnings=False):
         self.name = "Basic"
         if number_of_ants is not None and number_of_ants <= 0:
             raise Exception("Negative number of ants")
@@ -158,6 +159,7 @@ class AntColony:
         self.starting_pheromone = starting_pheromone
         self.Q = Q
         self.ro = ro
+        self.cars_penalty = cars_penalty
         self.print_warnings = print_warnings
 
     def set_problem(self, s_max, number_of_cars, problem):
@@ -306,6 +308,7 @@ class AntColony:
 
         return np.where(possible_nodes)[0][np.where(u < my_cum_sum)[0][0]]  # EXP: np.where(u < my_cum_sum) == ([3,4,5],) # so the 3 was drawn
 
+
     def get_possible_nodes(self, visited_nodes, capacity_left, dist_from_warehouse):
         node = visited_nodes[-1]
 
@@ -327,14 +330,27 @@ class AntColony:
             cost_sum += self.distance_matrix[path[i], path[i + 1]]
         return cost_sum
 
-    def pheromone_modify(self, paths, costs):
+    def pheromone_modify(self, paths, costs, num_of_cycles):
         self.pheromone_matrix *= (1 - self.ro)
         delta_pheromone_matrix = np.zeros_like(self.pheromone_matrix)
-        for path in paths:
-            # e.g. path = [0,4,3,0,1,5,2,0]
-            for i in range(len(path) - 1):
-                delta_pheromone_matrix[path[i], path[i + 1]] += 1 / costs[i]
+        self.no_modification = 0
+        for i in range(len(paths)):
+            # e.g. paths[i] = [0,4,3,0,1,5,2,0]
+            modified_delta = 1 / costs[i]
+            penalty = max(num_of_cycles[i] - self.number_of_cars, 0) / self.number_of_cars * self.cars_penalty
+            modified_delta -= min(penalty, 1) * modified_delta
+
+            if modified_delta > 0:
+                for j in range(len(paths[i]) - 1):
+                    delta_pheromone_matrix[paths[i][j], paths[i][j + 1]] += modified_delta
+            else:
+                self.no_modification += 1
+
         self.pheromone_matrix += self.Q * delta_pheromone_matrix
+
+        if self.no_modification > 0.8 * self.number_of_ants:
+            return False
+        return True
 
     def single_iteration(self):
         paths = [None for i in range(self.number_of_ants)]
@@ -356,12 +372,18 @@ class AntColony:
                                                                                                    self.best_cost,
                                                                                                    self.best_number_of_cycles))
 
-        self.pheromone_modify(paths, costs)
+        continue_optimization = self.pheromone_modify(paths, costs, num_of_cycles)
+
         self.calculate_transition_matrix()
+
+        if not continue_optimization:
+            return False
+
+        return True
 
     def optimize(self, max_iter=None, print_progress=False, rng_seed=None, restart=True, check_cars=True, max_time=None):
         if max_time is None:
-            max_time = 60 * 60 * 24  # 24 hours
+            max_time = 5  # 5 minutes
         if max_iter is None:
             max_iter = 10_000  # 10 thousands iterations
         self.max_iter = max_iter
@@ -380,7 +402,8 @@ class AntColony:
         while self.now_iter < max_iter:
             t = time.time()
             self.iters_done += 1
-            self.single_iteration()
+            continue_optimization = self.single_iteration()
+
             self.now_iter += 1
             elapsed = time.time() - t
 
@@ -388,6 +411,11 @@ class AntColony:
             if self.time_of_optimization + elapsed > max_time:
                 if self.print_progress:
                     print("Time for optimization has passed on {}th iteration".format(self.now_iter))
+                break
+
+            if not continue_optimization:
+                if self.print_progress:
+                    print("Nearly no progress has been made on {}th iteration. Try the optimization with bigger number_of_cars".format(self.now_iter))
                 break
 
         if self.now_iter == max_iter and self.print_progress:
@@ -428,10 +456,10 @@ class AntColony_Abstract_Modification(AntColony):
 
 
 class AntColony_Reduced(AntColony_Abstract_Modification):
-    def __init__(self, number_of_ants=None, alpha=1, beta=1, starting_pheromone=1, Q=1, ro=0.9, print_warnings=False):
+    def __init__(self, number_of_ants=None, alpha=1, beta=1, starting_pheromone=1, Q=1, ro=0.9, cars_penalty=0.1, print_warnings=False):
         super(AntColony_Reduced, self).__init__(number_of_ants=number_of_ants, alpha=alpha, beta=beta,
                                                 starting_pheromone=starting_pheromone, Q=Q, ro=ro,
-                                                print_warnings=print_warnings)
+                                                cars_penalty=cars_penalty, print_warnings=print_warnings)
         self.name = "Reduced"
 
     def calculate_legal_edges(self):
@@ -513,10 +541,10 @@ class AntColony_Divided_Cluster(AntColony_Abstract_Modification):
 
 
 class AntColony_Divided(AntColony):  # The same interface as AntColony, but those are only workarounds
-    def __init__(self, number_of_ants=None, alpha=1, beta=1, starting_pheromone=1, Q=1, ro=0.9, print_warnings=False):
+    def __init__(self, number_of_ants=None, alpha=1, beta=1, starting_pheromone=1, Q=1, ro=0.9, cars_penalty=0.1, print_warnings=False):
         super(AntColony_Divided, self).__init__(number_of_ants=number_of_ants, alpha=alpha, beta=beta,
                                                 starting_pheromone=starting_pheromone, Q=Q, ro=ro,
-                                                print_warnings=print_warnings)
+                                                cars_penalty=cars_penalty, print_warnings=print_warnings)
         self.name = "Divided"
 
     def set_problem(self, s_max, number_of_cars, problem):
@@ -591,14 +619,17 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
 
     def set_cluster(self):
         self.cluster_solver = AntColony_Divided_Cluster(self.number_of_ants, self.alpha, self.beta,
-                                                        self.starting_pheromone, self.Q, self.ro, self.print_warnings)
+                                                        self.starting_pheromone, self.Q, self.ro,
+                                                        cars_penalty=self.cars_penalty,
+                                                        print_warnings=self.print_warnings)
         self.cluster_solver.set_problem(self.s_max, self.number_of_cars, self.problem)
 
-    def cluster_solve(self, i, max_iter, rng_seed, check_cars, max_time):
+    def cluster_solve(self, i, max_iter, rng_seed, check_cars, max_time, max_cars):
         self.cluster_solver.add_subset(self.clusters[i])
+        self.cluster_solver.number_of_cars = max_cars
 
-        self.cluster_solver.optimize(max_iter=max_iter, print_progress=self.print_progress, restart=False, rng_seed=rng_seed,
-                                     check_cars=check_cars, max_time=max_time)
+        self.cluster_solver.optimize(max_iter=max_iter, print_progress=self.print_progress, restart=False,
+                                     rng_seed=rng_seed, check_cars=check_cars, max_time=max_time)
 
         self.best_path_clusters[i] = self.cluster_solver.best_path
         self.best_cost_clusters[i] = self.cluster_solver.best_cost
@@ -621,11 +652,13 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
 
         self.iters_done = max_iter
 
-        max_time_cluster = [max_time / (self.problem_size - 1) * len(x) for x in self.clusters]
+        cluster_percent = np.array([len(x) / (self.problem_size-1) for x in self.clusters])
+        max_time_cluster = max_time * cluster_percent
+        max_cars_cluster = np.floor(cluster_percent * self.cars_penalty) + 1
         for i in range(self.number_of_clusters):
             if print_progress:
                 print("\nOptimization of cluster {} with {} nodes:".format(i+1, len(self.clusters[i])))
-            self.cluster_solve(i, max_iter, rng_seed, check_cars, max_time_cluster[i])
+            self.cluster_solve(i, max_iter, rng_seed, check_cars, max_time_cluster[i], max_cars_cluster[i])
 
         self.best_cost = sum(self.best_cost_clusters)
         self.best_number_of_cycles = sum(self.best_number_of_cycles_clusters)
