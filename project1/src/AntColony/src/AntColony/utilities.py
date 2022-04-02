@@ -85,23 +85,26 @@ def save_to_file(antColont, file):
     except:
         pass # folder already exists
 
-    with open(file, 'w') as myfile:
-        myfile.write("best_cost = {}".format(antColont.best_cost))
-        myfile.write("\nbest_number_of_cycles = {}".format(antColont.best_number_of_cycles))
-        myfile.write("\nbest_path = {}".format(antColont.best_path))
-        myfile.write("\n")
-
-        if antColont.name != "Greedy":
+    try:
+        with open(file, 'w') as myfile:
+            myfile.write("best_cost = {}".format(antColont.best_cost))
+            myfile.write("\nbest_number_of_cycles = {}".format(antColont.best_number_of_cycles))
+            myfile.write("\nbest_path = {}".format(antColont.best_path))
             myfile.write("\niters_done = {}".format(antColont.iters_done))
-            myfile.write("\nalpha = {}".format(antColont.alpha))
-            myfile.write("\nbeta = {}".format(antColont.beta))
-            myfile.write("\ncars_penalty = {}".format(antColont.cars_penalty))
-            myfile.write("\nnumber_of_ants = {}".format(antColont.number_of_ants))
-            myfile.write("\nnumber_of_cars = {}".format(antColont.number_of_cars))
-            myfile.write("\nQ = {}".format(antColont.Q))
-            myfile.write("\nro = {}".format(antColont.ro))
-            myfile.write("\ntime_of_optimization = {}".format(antColont.time_of_optimization))
             myfile.write("\n")
+
+            if antColont.name != "Greedy":
+                myfile.write("\nalpha = {}".format(antColont.alpha))
+                myfile.write("\nbeta = {}".format(antColont.beta))
+                myfile.write("\ncars_penalty = {}".format(antColont.cars_penalty))
+                myfile.write("\nnumber_of_ants = {}".format(antColont.number_of_ants))
+                myfile.write("\nnumber_of_cars = {}".format(antColont.number_of_cars))
+                myfile.write("\nQ = {}".format(antColont.Q))
+                myfile.write("\nro = {}".format(antColont.ro))
+                myfile.write("\ntime_of_optimization = {}".format(antColont.time_of_optimization))
+                myfile.write("\n")
+    except:
+        print('Something is wrong. Most probably you dont have the "logs" folder. Create it manually.')
 
 def args_to_dict(args, known_names, specials=None, split='=', # copied from cocoex; usefun in script.py
                  print=lambda *args, **kwargs: None):
