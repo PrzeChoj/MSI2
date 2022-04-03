@@ -12,6 +12,8 @@ import numpy as np
 from AntColony import *
 import sys
 
+np.seterr(divide='ignore', invalid='ignore')  # this warning is not important, it is served in package
+
 def solve_single_problem(problem, seed, max_time):
     if problem is None:
         raise Exception("Problem number should be provided. See python solve_single_problem.py help")

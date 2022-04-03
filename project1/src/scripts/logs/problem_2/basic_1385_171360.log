@@ -1,0 +1,13 @@
+best_cost = 1385.2024744502455
+best_number_of_cycles = 9
+best_path = [0, 2, 0, 13, 14, 38, 9, 36, 43, 29, 40, 0, 31, 8, 15, 28, 27, 19, 0, 12, 30, 3, 6, 0, 22, 41, 20, 16, 11, 10, 39, 34, 0, 25, 18, 35, 1, 33, 24, 4, 0, 23, 7, 0, 5, 21, 32, 37, 42, 26, 0, 17, 0]
+iters_done = 383
+
+alpha = 2
+beta = 3.5
+cars_penalty = 0.1
+number_of_ants = 88
+number_of_cars = 6
+Q = 1
+ro = 0.9
+time_of_optimization = 299.85462641716003
