@@ -10,9 +10,17 @@ from sys import maxsize
 from .AntColony import *
 from .Problem import Problem
 
+rng = np.random.default_rng()
+
 np.set_printoptions(suppress=True,  # no scientific notation
                     threshold=maxsize,  # logging the whole np.arrays
                     linewidth=np.inf)  # one line for vectors
+
+# Font for matplotlib plots:
+font = {'weight' : 'bold',
+        'size'   : 16}
+plt.rc('font', **font)
+
 
 def pos_from_coordinates(coordinates):
     pos = {}
@@ -21,7 +29,7 @@ def pos_from_coordinates(coordinates):
     return pos
 
 
-def plot_solution(antColony, labels=False, ax=None):
+def plot_solution(antColony, labels=False, ax=None, start_title=""):
     M = antColony.problem_size
     P = [None] * M
     P[0] = "blue"
@@ -48,7 +56,7 @@ def plot_solution(antColony, labels=False, ax=None):
                                 edgelist=[(antColony.best_path[i], antColony.best_path[i + 1]) for i in
                                           range(len(antColony.best_path) - 1)],
                                 with_labels=True, ax=ax)
-        ax.set_title("{}, cost = {:.0f}, trucks = {}, iters = {}".format(antColony.name,
+        ax.set_title(start_title + "{}\ncost = {:.0f}, trucks = {}, iters = {}".format(antColony.name,
                                                                          antColony.best_cost,
                                                                          antColony.best_number_of_cycles,
                                                                          antColony.iters_done))
@@ -58,7 +66,8 @@ def plot_solution(antColony, labels=False, ax=None):
                                           range(len(antColony.best_path) - 1)],
                                 with_labels=True)
         print(
-            "Optimization with {}: iterations = {}, cost = {:.3f}, trucks = {}".format(antColony.name, antColony.iters_done,
+            "Optimization with {}: iterations = {}, cost = {:.3f}, trucks = {}".format(antColony.name,
+                                                                                       antColony.iters_done,
                                                                                        antColony.best_cost,
                                                                                        antColony.best_number_of_cycles))
 
@@ -66,28 +75,29 @@ def plot_solution(antColony, labels=False, ax=None):
 
 
 def plot_4_solutions(antColony1, antColony2, antColony3, antColony4,
-                     labels=False, figsize=(15, 10), save_file=None):
+                     labels=False, figsize=(15, 10), save_file=None, start_title=""):
     fig, axs = plt.subplots(2, 2, figsize=figsize)
 
-    plot_solution(antColony1, labels, axs[0, 0])
+    plot_solution(antColony1, labels, axs[0, 0], start_title)
 
-    plot_solution(antColony2, labels, axs[0, 1])
+    plot_solution(antColony2, labels, axs[0, 1], start_title)
 
-    plot_solution(antColony3, labels, axs[1, 0])
+    plot_solution(antColony3, labels, axs[1, 0], start_title)
 
-    plot_solution(antColony4, labels, axs[1, 1])
+    plot_solution(antColony4, labels, axs[1, 1], start_title)
 
     if save_file is not None:
         fig.savefig(save_file)
 
+
 def save_to_file(antColont, file):
     # we assume the "logs" folder already exists
     try:
-        pattern = re.compile("\/[^\/]*$") # find the moment where the folder name ends and file name starts
+        pattern = re.compile("\/[^\/]*$")  # find the moment where the folder name ends and file name starts
         pattern_search = pattern.search(file)
         os.mkdir(file[0:pattern_search.start()])
     except:
-        pass # folder already exists
+        pass  # folder already exists
 
     try:
         with open(file, 'w') as myfile:
@@ -110,13 +120,15 @@ def save_to_file(antColont, file):
     except:
         print('Something is wrong. Most probably you dont have the "logs" folder. Create it manually.')
 
-def args_to_dict(args, known_names, specials=None, split='=', # copied from cocoex; usefun in script.py
+
+def args_to_dict(args, known_names, specials=None, split='=',  # copied from cocoex; usefun in script.py
                  print=lambda *args, **kwargs: None):
     def eval_value(value):
         try:
             return _ast.literal_eval(value)
         except ValueError:
             return value
+
     res = {}
     for arg in args:
         name, value = arg.split(split)
@@ -134,8 +146,8 @@ def args_to_dict(args, known_names, specials=None, split='=', # copied from coco
         for known_name in known_names if known_names is not None else [name]:
             # check that name is an abbreviation of known_name and unique in known_names
             if known_name.startswith(name) and (
-                        sum([other.startswith(name)
-                             for other in known_names or [names]]) == 1):
+                    sum([other.startswith(name)
+                         for other in known_names or [problem_names]]) == 1):
                 res[known_name] = eval_value(value)
                 print(known_name, '=', res[known_name])
                 break  # name == arg.split()[0] is processed
@@ -144,7 +156,13 @@ def args_to_dict(args, known_names, specials=None, split='=', # copied from coco
     return res
 
 
+# logs for Divided were missing the "," sing. This should fix it
+def fix_text(text):
+    return re.sub("[0-9]\s+", lambda number_and_space: number_and_space[0] + ", ", text)
+
+
 def plot_4_medians(problem_id, labels=False, is_save_file=False):
+    problem_id -= 1
     problem_strings = ["./../../data/augerat/A-n32-k05.xml",
                        "./../../data/augerat/A-n44-k06.xml",
                        "./../../data/augerat/A-n60-k09.xml",
@@ -152,8 +170,10 @@ def plot_4_medians(problem_id, labels=False, is_save_file=False):
                        "./../../data/uchoa/X-n101-k25.xml",
                        "./../../data/uchoa/X-n120-k6.xml"]
 
-    photo_files = ["graphs/small1.png", "graphs/small2.png", "graphs/medium1.png",
-                   "graphs/medium2.png", "graphs/big1.png", "graphs/big2.png"]
+    photo_files = ["graphs/median_1.png", "graphs/median_2.png", "graphs/median_3.png",
+                   "graphs/median_4.png", "graphs/median_5.png", "graphs/median_6.png"]
+
+    problem_names = ["Small 1", "Small 2", "Medium 1", "Medium 2", "Big 1", "Big 2"]
 
     problems = [Problem(file) for file in problem_strings]
     s_maxs = [205, 285, 223, 223, 1750, 2641.2]
@@ -199,7 +219,7 @@ def plot_4_medians(problem_id, labels=False, is_save_file=False):
          14, 58, 83, 15, 44, 18, 17, 103, 8, 0, 87, 72, 62, 40, 111, 102, 34, 27, 11, 56, 1, 24, 37, 57, 100, 77, 53,
          90, 114, 0, 6, 92, 35, 59, 22, 4, 95, 60, 68, 81, 69, 85, 89, 0, 36, 115, 48, 65, 86, 74, 110, 106, 7, 97, 19,
          28, 0, 41, 5, 26, 117, 108, 66, 46, 75, 0, 51, 63, 104, 0, 47, 101, 0, 105, 0]
-        ]
+    ]
     basic_paths = [
         [0, 16, 12, 1, 7, 0, 30, 26, 17, 19, 31, 21, 13, 0, 28, 4, 18, 27, 0, 22, 9, 29, 5, 20, 0, 14, 24, 23, 3, 2, 6,
          0, 25, 10, 15, 0, 11, 8, 0],
@@ -221,7 +241,7 @@ def plot_4_medians(problem_id, labels=False, is_save_file=False):
          108, 113, 64, 109, 42, 39, 12, 16, 0, 69, 81, 68, 35, 92, 6, 40, 34, 111, 102, 112, 0, 77, 100, 19, 28, 82, 49,
          0, 7, 97, 85, 70, 0, 117, 5, 26, 3, 114, 54, 0, 36, 115, 75, 58, 9, 99, 2, 21, 0, 4, 95, 60, 22, 51, 89, 41, 0,
          86, 65, 74, 110, 106, 44, 0, 57, 59, 37, 24, 1, 27, 11, 0, 104, 63, 0, 48, 0, 105, 0, 47, 101, 0]
-        ]
+    ]
     reduced_paths = [
         [0, 30, 16, 1, 12, 0, 24, 14, 26, 0, 18, 8, 11, 0, 27, 0, 20, 5, 25, 10, 15, 29, 0, 3, 23, 2, 6, 13, 0, 19, 17,
          31, 21, 7, 0, 9, 22, 0, 4, 28, 0],
@@ -243,7 +263,7 @@ def plot_4_medians(problem_id, labels=False, is_save_file=False):
          75, 0, 12, 21, 79, 118, 33, 30, 25, 73, 31, 67, 0, 117, 108, 66, 46, 97, 7, 106, 74, 0, 58, 23, 14, 36, 48, 86,
          65, 115, 0, 80, 32, 91, 0, 85, 89, 5, 26, 41, 0, 84, 0, 45, 70, 93, 29, 38, 0, 104, 63, 51, 0, 16, 0, 35, 37,
          24, 1, 56, 11, 27, 0, 107, 71, 96, 54, 112, 3, 78, 109, 43, 2, 49, 0, 47, 101, 0, 110, 83, 15, 0, 105, 0]
-        ]
+    ]
     divided_paths = [
         [0, 11, 8, 18, 0, 3, 2, 23, 0, 22, 9, 0, 4, 28, 0, 27, 29, 15, 10, 25, 5, 20, 0, 12, 1, 7, 16, 26, 24, 0, 30, 0,
          13, 21, 31, 19, 17, 6, 14, 0],
@@ -265,7 +285,7 @@ def plot_4_medians(problem_id, labels=False, is_save_file=False):
          93, 76, 43, 113, 64, 109, 78, 39, 8, 73, 25, 29, 12, 91, 32, 31, 0, 2, 49, 42, 82, 3, 112, 45, 84, 0, 20, 0,
          98, 13, 28, 19, 46, 66, 108, 103, 17, 18, 44, 9, 99, 0, 23, 58, 15, 83, 97, 7, 106, 110, 74, 65, 86, 48, 115,
          36, 0, 75, 14, 0, 102, 72, 87, 62, 40, 111, 34, 27, 11, 56, 1, 24, 35, 92, 6, 114, 90, 0]
-        ]
+    ]
 
     # define algorithms:
     greedy = Greedy()
@@ -281,14 +301,14 @@ def plot_4_medians(problem_id, labels=False, is_save_file=False):
     antColony_basic.best_cost = basic_costs[problem_id]
     antColony_basic.iters_done = basic_iters_dones[problem_id]
 
-    antColony_reduced = AntColony()
+    antColony_reduced = AntColony_Reduced()
     antColony_reduced.set_problem(s_maxs[problem_id], max_cars[problem_id], problems[problem_id])
     antColony_reduced.best_path = reduced_paths[problem_id]
     antColony_reduced.best_number_of_cycles = reduced_number_of_cycles[problem_id]
     antColony_reduced.best_cost = reduced_costs[problem_id]
     antColony_reduced.iters_done = reduced_iters_dones[problem_id]
 
-    antColony_divided = AntColony()
+    antColony_divided = AntColony_Divided()
     antColony_divided.set_problem(s_maxs[problem_id], max_cars[problem_id], problems[problem_id])
     antColony_divided.best_path = divided_paths[problem_id]
     antColony_divided.best_number_of_cycles = divided_number_of_cycles[problem_id]
@@ -299,4 +319,72 @@ def plot_4_medians(problem_id, labels=False, is_save_file=False):
 
     # plot solutions:
     plot_4_solutions(greedy, antColony_basic, antColony_reduced, antColony_divided,
-                     labels=labels, save_file=save_file)
+                     labels=labels, save_file=save_file, start_title=problem_names[problem_id] + "; ")
+
+
+# distributions plots:
+# those costs are from logs:
+greedy_s1_cost = np.array([1547])
+greedy_s2_cost = np.array([1412])
+greedy_m1_cost = np.array([1902])
+greedy_m2_cost = np.array([1575])
+greedy_b1_cost = np.array([39789])
+greedy_b2_cost = np.array([24634])
+
+basic_s1_costs = np.array([1208, 1209, 1214, 1220, 1225, 1232, 1233, 1236, 1239, 1241, 1248])
+basic_s2_costs = np.array([1241, 1250, 1329, 1341, 1342, 1343, 1346, 1355, 1385, 1391, 1427])
+basic_m1_costs = np.array([2012, 2083, 2088, 2100, 2113, 2125, 2135, 2135, 2139, 2168, 2180])
+basic_m2_costs = np.array([1949, 1966, 1971, 1988, 1993, 1995, 2004, 2008, 2011, 2024, 2033])
+basic_b1_costs = np.array([39608, 40147, 40168, 40294, 40335, 40488, 40582, 40736, 40806, 40821, 40892])
+basic_b2_costs = np.array([40467, 40844, 41105, 42270, 42836, 42881, 42986, 43160, 43458, 43489, 43740])
+
+reduced_s1_costs = np.array([1291, 1311, 1315, 1317, 1317, 1318, 1318, 1329, 1340, 1346, 1347])
+reduced_s2_costs = np.array([1254, 1264, 1268, 1298, 1320, 1321, 1336, 1343, 1343, 1353, 1358])
+reduced_m1_costs = np.array([1904, 1930, 1953, 1971, 1983, 2010, 2014, 2019, 2022, 2028, 2032])
+reduced_m2_costs = np.array([1697, 1714, 1732, 1732, 1733, 1752, 1768, 1777, 1784, 1789, 1820])
+reduced_b1_costs = np.array([35062, 35187, 36051, 36247, 36277, 36397, 36421, 36534, 36595, 36751, 36879])
+reduced_b2_costs = np.array([33583, 34467, 34701, 34793, 34998, 35043, 35131, 35193, 35282, 35989, 36002])
+
+divided_s1_costs = np.array([1268, 1270, 1270, 1271, 1271, 1272, 1273, 1273, 1273, 1273, 1273])
+divided_s2_costs = np.array([1143, 1150, 1164, 1165, 1169, 1170, 1175, 1176, 1182, 1206, 1206])
+divided_m1_costs = np.array([1678, 1687, 1691, 1691, 1693, 1697, 1702, 1707, 1714, 1717, 1729])
+divided_m2_costs = np.array([1369, 1386, 1396, 1402, 1407, 1412, 1416, 1422, 1431, 1433, 1449])
+divided_b1_costs = np.array([33849, 34193, 34360, 34387, 34471, 34493, 34733, 34781, 34819, 34861, 34865])
+divided_b2_costs = np.array([29047, 29273, 29435, 29511, 29789, 29804, 29876, 30204, 30210, 30247, 31449])
+
+s1_costs = [greedy_s1_cost, basic_s1_costs, reduced_s1_costs, divided_s1_costs]
+s2_costs = [greedy_s2_cost, basic_s2_costs, reduced_s2_costs, divided_s2_costs]
+m1_costs = [greedy_m1_cost, basic_m1_costs, reduced_m1_costs, divided_m1_costs]
+m2_costs = [greedy_m2_cost, basic_m2_costs, reduced_m2_costs, divided_m2_costs]
+b1_costs = [greedy_b1_cost, basic_b1_costs, reduced_b1_costs, divided_b1_costs]
+b2_costs = [greedy_b2_cost, basic_b2_costs, reduced_b2_costs, divided_b2_costs]
+
+costs = [None, s1_costs, s2_costs, m1_costs, m2_costs, b1_costs, b2_costs]
+problem_names = [None, "Small 1", "Small 2", "Medium 1", "Medium 2", "Big 1", "Big 2"]
+
+def get_x_for_plot(np_array, m, u=0.3):
+    return m + rng.uniform(-1, 1, size=len(np_array)) * u
+
+def get_cords(costs, u=0.3):
+    x_cords = np.concatenate([get_x_for_plot(costs[i], i + 1, u) for i in range(1, 4)])
+    x_cords = np.concatenate((np.ones(1), x_cords))
+    y_cords = np.concatenate(costs)
+
+    return x_cords, y_cords
+
+def plot_distr(problem_id, save=False):
+    x_cords, y_cords = get_cords(costs[problem_id])
+
+    colours = ["brown"] + ["green"] * 11 + ["orange"] * 11 + ["red"] * 11
+
+    with plt.style.context('bmh'):
+        fig, ax = plt.subplots(1, 1, figsize=(8, 5))#plt.figure(figsize=[2, 1])
+        #ax = fig.add_axes([1, 2, 3, 4])
+
+        ax.scatter(x_cords, y_cords, alpha=0.8, c=colours)
+
+        plt.title(problem_names[problem_id])
+        plt.xticks([1, 2, 3, 4], ["Greedy", "Basic", "Reduced", "Divided"])
+
+        if save:
+            fig.savefig("graphs/distr_{}.png".format(problem_id))
