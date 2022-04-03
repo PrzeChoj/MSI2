@@ -135,7 +135,7 @@ class AntColony:
             self.cost = cost
             self.trucks = trucks
 
-    def __init__(self, number_of_ants=None, alpha=2, beta=3.5,
+    def __init__(self, number_of_ants=None, alpha=1, beta=1,
                  starting_pheromone=1, Q=1, ro=0.9, cars_penalty=0.1,
                  print_warnings=False):
         self.name = "Basic"
@@ -254,7 +254,7 @@ class AntColony:
                                                                     self.problem_size)) - np.eye(self.problem_size))
 
     def ant_find_path(
-            self):  # return (list of nodes, number of times to start from warehouse - number of 0 in list of nodes minus 1 - number of ant_find_circle() calls)
+            self):  # returns the list of nodes, number of times to start from warehouse - number of 0 in list of nodes minus 1 - number of ant_find_circle() calls
         visited_nodes = [0]  # start from warehouse
         number_of_cycles = 0
         while len(
@@ -337,13 +337,13 @@ class AntColony:
         self.no_modification = 0
         for i in range(len(paths)):
             # e.g. paths[i] = [0,4,3,0,1,5,2,0]
-            modified_delta = 1 / costs[i]
+            modifier_delta = 1 / costs[i]
             penalty = max(num_of_cycles[i] - self.number_of_cars, 0) / self.number_of_cars * self.cars_penalty
-            modified_delta -= min(penalty, 1) * modified_delta
+            modifier_delta -= min(penalty, 1) * modifier_delta
 
-            if modified_delta > 0:
+            if modifier_delta > 0:
                 for j in range(len(paths[i]) - 1):
-                    delta_pheromone_matrix[paths[i][j], paths[i][j + 1]] += modified_delta
+                    delta_pheromone_matrix[paths[i][j], paths[i][j + 1]] += modifier_delta
             else:
                 self.no_modification += 1
 
@@ -632,7 +632,7 @@ class AntColony_Divided(AntColony):  # The same interface as AntColony, but thos
         self.cluster_solver.optimize(max_iter=max_iter, print_progress=self.print_progress, restart=False,
                                      rng_seed=rng_seed, check_cars=check_cars, max_time=max_time)
 
-        self.best_path_clusters[i] = self.cluster_solver.best_path
+        self.best_path_clusters[i] = list(self.cluster_solver.best_path)  # self.cluster_solver.best_path is np.array()
         self.best_cost_clusters[i] = self.cluster_solver.best_cost
         self.best_number_of_cycles_clusters[i] = self.cluster_solver.best_number_of_cycles
 
