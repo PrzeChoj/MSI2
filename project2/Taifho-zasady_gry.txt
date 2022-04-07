@@ -1,0 +1,13 @@
+1. Gra dla 2 graczy
+2. Plansza 8x10
+3. Pionki graczy stają na skrajnych bokach (plansza 8x8 jest pusta)
+4. Nie ma bicia (wszystkie pionki do końca gry zostają na planszy)
+5. Wygrywa tan gracz, który jako pierwszy umieści wszystkie swoje pionki na polach startowych przeciwnika
+6. Są 4 rodzaje pionków: koło, trójkąt, kwadrat, romb. Każdy gracz ma 2 pionki każdego kształtu
+7. Pionki poruszają się o jeden w kierunku, w który wskazuje jego bok (romb może się ruszać po ukosie, kwadrat wzdłuż i wszerz, koło we wszystkich kierunkach, trójkąt albo po ukosie do przodu, albo po prostej do tyłu)
+8. Skoki: pionkiem można ruszyć o więcej niż jeden, ale tylko o nieparzystą liczbę oczek oraz tak, żeby na środku skoku był inny pionek i tylko jeden (nie ważne, który gracz). Np. w sytuacji: N _ C _ _, gdzie N to niebieski pionek, a C to czarny, a _ to puste pole, oraz legalny jest ruch _ N C _ _, to legalny jest też ruch _ _ C _ N. W sytuacji N _ C C _ nielegalnym ruchem jest _ _ C C N, a w sytuacji N _ C C _ _ nielegalnym jest ruch _ _ C C _ N.
+9. Skoki wielokrotne: Jeśli pionek po wykonaniu skoku znów jest w sytuacji w której mógłby wykonać róch, gdyby był jego ruch, to może. Czyli można skakać wielokrotnie jako jeden ruch.
+10. UWAGA: Nie można uniemożliwić przeciwnikowi zwycięstwa: Jeśli gracz nie chce ruszyć swoim pionkiem z początku planszy, to przegrywa. Dokładnie: Jeśli wszystkie pola startowe gracza C są zajęte, ale jest teraz ruch inny niż 1, to C przegrywa. Nie ważne, jakiego koloru są pionki.
+
+Zasada, której nie będę rozważał (na początku):
+11. Na początku rozgrywki gracze na zmianę kładą swoje pionki na polach startowych. Ja będę rozwarzał pozycję startową trójkąt, koło, romb, kwadrat, romb, koło, kwadrat, trójkąt
