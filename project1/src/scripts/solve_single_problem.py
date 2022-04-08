@@ -5,7 +5,7 @@ Examples:
     python solve_single_problem.py help
     python solve_single_problem.py problem=1 # small_1
     python solve_single_problem.py problem=6 # big_2
-    python solve_single_problem.py problem=4 seed=1234 max_time = 300
+    python solve_single_problem.py problem=4 seed=1234 max_time = 300 number_of_repetitions=1
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ import sys
 
 np.seterr(divide='ignore', invalid='ignore')  # this warning is not important, it is served in package
 
-def solve_single_problem(problem, seed, max_time):
+def solve_single_problem(problem, seed, max_time, number_of_repetitions = 11):
     if problem is None:
         raise Exception("Problem number should be provided. See python solve_single_problem.py help")
     if max_time is None:
@@ -23,7 +23,7 @@ def solve_single_problem(problem, seed, max_time):
     problem_number = problem
     rng_seed = seed
 
-    print("Optimizing problem no. {} with seed = {} with max_time = {}".format(problem_number, rng_seed, max_time))
+    print("Optimizing problem no. {} with seed = {} with max_time = {} with number_of_repetitions = {}".format(problem_number, rng_seed, max_time, number_of_repetitions))
 
     rng = np.random.default_rng(rng_seed)
 
@@ -51,7 +51,7 @@ def solve_single_problem(problem, seed, max_time):
 
     # Basic
     print("\nBasic")
-    for i in range(11):
+    for i in range(number_of_repetitions):
         seed_this_iter = rng.integers(1, 1e6)
 
         antColony_basic = AntColony(print_warnings=False)
@@ -67,7 +67,7 @@ def solve_single_problem(problem, seed, max_time):
 
     # Reduced
     print("\n\nReduced")
-    for i in range(11):
+    for i in range(number_of_repetitions):
         seed_this_iter = rng.integers(1, 1e6)
 
         antColony_reduced = AntColony_Reduced(print_warnings=False)
@@ -81,7 +81,7 @@ def solve_single_problem(problem, seed, max_time):
 
     # Divided
     print("\n\nDivided")
-    for i in range(11):
+    for i in range(number_of_repetitions):
         seed_this_iter = rng.integers(1, 1e6)
 
         antColony_divided = AntColony_Divided(print_warnings=False)
@@ -105,8 +105,9 @@ if __name__ == '__main__':
     problem = None
     seed = None
     max_time = None
+    number_of_repetitions = 11
 
     input_params = args_to_dict(sys.argv[1:], globals(), print=print)
     globals().update(input_params)
 
-    solve_single_problem(problem, seed, max_time)
+    solve_single_problem(problem, seed, max_time, number_of_repetitions)

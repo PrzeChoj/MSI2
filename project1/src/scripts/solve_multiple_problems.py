@@ -1,9 +1,12 @@
 """
 Script for solving a single problem of 6 that we consider in this work.
 
+The line | means that the algorithm found the solution better than Greedy.
+The dot . means that the algorithm found the solution worse than Greedy.
+
 Examples:
-    python solve_multiple_problem.py help
-    python solve_multiple_problem.py seed=1234 max_time = 300
+    python solve_multiple_problems.py help
+    python solve_multiple_problems.py seed=1234 max_time=300 number_of_repetitions=3
 """
 
 from AntColony import args_to_dict
@@ -18,11 +21,12 @@ if __name__ == '__main__':
 
     seed = None
     max_time = None
+    number_of_repetitions = 11
 
     input_params = args_to_dict(sys.argv[1:], globals(), print=print)
     globals().update(input_params)
 
     for i in range(1, 7):  # i \in {1,2,3,4,5,6}
-        solve_single_problem(problem=i, seed=seed, max_time=max_time)
+        solve_single_problem(problem=i, seed=seed, max_time=max_time, number_of_repetitions=number_of_repetitions)
 
     print("\n\nMultiple problems solved")
