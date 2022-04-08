@@ -16,6 +16,7 @@ After the point 5, you should see somenthing like this:
 
 The script `solve_multiple_problem.py` has some parameters. One can see them with `python solve_multiple_problem.py help`
 
+The script was executed with `max_time=300` and `number_of_repetitions=11`, which results with approximately 16 and a half hours of computing (300 seconds * 11 number\_of\_repetitions * 6 datasets * 3 modifictions = 16.5 hours).
 
 
 ## Project 2 - Solving the Taifho game with MCTS algorithm
