@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+src/Taifho/Position.py
+src/Taifho/__init__.py
+src/Taifho.egg-info/PKG-INFO
+src/Taifho.egg-info/SOURCES.txt
+src/Taifho.egg-info/dependency_links.txt
+src/Taifho.egg-info/requires.txt
+src/Taifho.egg-info/top_level.txt
