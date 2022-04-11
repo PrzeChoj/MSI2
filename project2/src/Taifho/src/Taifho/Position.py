@@ -3,14 +3,14 @@ import numpy as np
 class Position:
     def __init__(self):
         self.shapes = {0: u'\u00B7',  # empty place
-                       1: u'\u25A1',  # white square
-                       2: u'\u25B3',  # white triangle
-                       3: u'\u25CB',  # white circle
-                       4: u'\u25C7',  # white dimond
-                       5: u'\u25C6',  # black dimond
-                       6: u'\u25C9',  # black circle
-                       7: u'\u25BC',  # black triangle
-                       8: u'\u25A0',  # black square
+                       1: '\033[92m' + u'\u25A1' + '\033[0m',  # white/green square
+                       2: '\033[92m' + u'\u25B3' + '\033[0m',  # white/green triangle
+                       3: '\033[92m' + u'\u25CB' + '\033[0m',  # white/green circle
+                       4: '\033[92m' + u'\u25C7' + '\033[0m',  # white/green dimond
+                       5: '\033[94m' + u'\u25C6' + '\033[0m',  # black/blue dimond
+                       6: '\033[94m' + u'\u25C9' + '\033[0m',  # black/blue circle
+                       7: '\033[94m' + u'\u25BC' + '\033[0m',  # black/blue triangle
+                       8: '\033[94m' + u'\u25A0' + '\033[0m',  # black/blue square
                        }
         self.board = self.get_starting_board()
         self.moves_made = 0
