@@ -25,3 +25,7 @@ In the Report, the script was executed with `max_time=300` and `number_of_repeti
 
 ## Project 2 - Solving the Taifho game with the MCTS algorithm
 
+1. We can gen into the same board in 2 different way. Should we remember this after the move?
+2. Shold we select moves uniformly? Or maybe we will prefer those that leads to pawns being further?
+
+
