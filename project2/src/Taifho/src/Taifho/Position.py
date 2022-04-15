@@ -41,6 +41,8 @@ class Position:
         move_str = "Green" if self.move_green else "Blue"
         print(f"Now move: " + move_str, end="\n\n")
 
+        self.board[self.board == 9] = 0
+
         board = self.board
 
         if self.selected_pawn is not None:
@@ -61,20 +63,33 @@ class Position:
             print("  ABCDEFGH")
 
     def select_pawn(self, position):
+        self.board[self.board == 9] = 0
+
         position_int = position_str_to_int(position)
 
         if not self.board[position_int[0], position_int[1]] in self.legal_figures:
-            pass
-        # TODO
+            raise Exception("wrong figure selected")
 
+        self.selected_pawn = position_int
 
     def calculate_possible_moves(self):
         """
         Returns a list off all possible moves for every pawn in int form
         """
+
         pass  # TODO
 
-    def calculate_legal_moves_for_pawn(self, pawn):
+    def distance_to_closest(self, pawn, direction):
+        """
+        returns the distance frm pawn to other pawn the closest to the pawn.
+        If the pawn is at the edge, returns 0.
+        If there is no other pawn up to the border, returns 20
+        """
+
+        # TODO
+        pass
+
+    def calculate_legal_moves_for_pawn(self, pawn, only_jumps=False):
         """
         Returns all squares that a given pawn can move to
         """
@@ -85,13 +100,44 @@ class Position:
         if pawn_figure not in self.legal_figures:
             raise Exception("wrong figure selected")
 
-        # I don't think this is a good way of finding legal moves. It is a lot of cases and ifs
-        legal_moves_for_pawn = []
-        if pawn_figure == 1:
-            if self.board[pawn[0]-1, pawn[1]] == 0:
-                legal_moves_for_pawn.append([pawn[0], pawn[1], pawn[0]-1, pawn[1]])
+        directions_to_look_for_moves = []  # 0 - up, 1 - up-right 2 - right, ..., 7 - up-left
+        if pawn_figure in [1, 8]:
+            directions_to_look_for_moves = [0, 2, 4, 6]
+        elif pawn_figure in [3, 6]:
+            directions_to_look_for_moves = [0, 1, 2, 3, 4, 5, 6, 7]
+        elif pawn_figure in [4, 5]:
+            directions_to_look_for_moves = [1, 3, 5, 7]
+        elif pawn_figure in [2]:
+            directions_to_look_for_moves = [1, 4, 7]
+        elif pawn_figure in [7]:
+            directions_to_look_for_moves = [0, 3, 5]
 
-        # TODO
+        legal_moves_for_pawn = []
+
+        for direction in directions_to_look_for_moves:
+            pawn_distance_to_closest = distance_to_closest(pawn, direction)
+            if pawn_distance_to_closest > 1:
+                next_place_for_pawn = next_place(pawn, direction)
+                if not only_jumps:
+                    move = [pawn[0], pawn[1], next_place_for_pawn[0], next_place_for_pawn[1]]
+
+                    legal_moves_for_pawn.append(move)
+
+                if pawn_distance_to_closest > 10:  # there is no other pawn to jump over
+                    continue
+
+                closest_other_pawn = next_place(next_place_for_pawn, direction, pawn_distance_to_closest)
+                pawn_distance_to_next = distance_to_closest(closest_other_pawn, direction)
+
+                if pawn_distance_to_next > pawn_distance_to_closest:
+                    next_place_for_pawn_jump = next_place(pawn, 2 * pawn_distance_to_closest)
+                    if next_place_for_pawn_jump is None:  # the board has ended
+                        continue
+
+                    # jump is legal
+                    move = [pawn[0], pawn[1], next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]]
+
+                    legal_moves_for_pawn.append(move)
 
         return legal_moves_for_pawn
 
@@ -99,7 +145,7 @@ class Position:
         if self.board[move_ints[0], move_ints[1]] not in self.legal_figures:
             print("Bad figure selected. Select your figure")
             return False
-        if self.board[move_ints[2], move_ints[3]] != 0:
+        if not self.board[move_ints[2], move_ints[3]] in [0, 9]:
             print("Destination field is occupied. Select other field")
             return False
 
@@ -124,6 +170,9 @@ class Position:
         self.move_green = not self.move_green
         self.legal_figures = [1, 2, 3, 4] if self.move_green else [5, 6, 7, 8]
         self.moves_made += 0.5
+
+        self.selected_pawn = None
+        self.board[self.board == 9] = 0
 
         self.check_is_terminal()
 
