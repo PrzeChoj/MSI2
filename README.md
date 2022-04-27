@@ -19,11 +19,13 @@ After that, One has the `AntColony` package installed in one's Python. Now One c
 After initializing the script, one should see something like this:
 ![Ongoing_script_photo_](project1/script_ongoing.png)
 
+The pipe (|) means that the found solution was better than the greedy solution. The dot (.) means that the found solution was worse than the greedy solution.
+
 The script `solve_multiple_problem.py` has some parameters. One can inspect them with `python solve_multiple_problem.py help`
 
 In the Report, the script was executed with `max_time=300` and `number_of_repetitions=11`, which results with approximately 16 and a half hours of computing (300 seconds * 11 number\_of\_repetitions * 6 datasets * 3 modifictions = 16.5 hours).
 
-## Project 2 - Solving the Taifho game with the MCTS algorithm
+## Projekt 2 - Zastosowanie Upper Confidence Bound Applied To Trees do stworzenia sztucznej inteligencji grającej w Taifho dla dwóch graczy
 
 1. We can gen into the same board in 2 different way. Should we remember this after the move?
 2. Shold we select moves uniformly? Or maybe we will prefer those that leads to pawns being further?
