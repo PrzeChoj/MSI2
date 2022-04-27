@@ -39,5 +39,5 @@ In the Report, the script was executed with `max_time=300` and `number_of_repeti
 6. TODO(Co dalej?)
 
 Pozycja startowa:
-![starting_board_photo](project/starting_board.png)
+![starting_board_photo](project2/starting_board.png)
 
