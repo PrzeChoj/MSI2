@@ -30,4 +30,12 @@ In the Report, the script was executed with `max_time=300` and `number_of_repeti
 1. We can gen into the same board in 2 different way. Should we remember this after the move?
 2. Shold we select moves uniformly? Or maybe we will prefer those that leads to pawns being further?
 
+### Jak zagrać z SI?
+1. Pobierz to repozytorium
+2. Przejdź do folderu `project2/src/Taifho`
+3. W Terminalu wpisz komendę: `pip install .`
+4. Włącz interpreter Python albo za pomocą `jupyter notebook`, bądź komendą `python`.
+5. Zaimportuj zainstalowaną bibliotekę: `import Taifho`
+6. TODO(Co dalej?)
+
 
