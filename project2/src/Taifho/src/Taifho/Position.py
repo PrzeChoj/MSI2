@@ -1,4 +1,5 @@
 import numpy as np
+from copy import copy
 
 from .utilities import *
 
@@ -79,23 +80,35 @@ class Position:
 
         pass  # TODO
 
-    def distance_to_closest(self, pawn, direction):
+    def distance_to_closest(self, pawn, direction, board=None):
         """
-        returns the distance frm pawn to other pawn the closest to the pawn.
+        returns the distance from a pawn to other pawn the closest to the pawn in a given direction.
         If the pawn is at the edge, returns 0.
         If there is no other pawn up to the border, returns 20
+
+        direction: 0 - up, 1 - up-right 2 - right, ..., 7 - up-left
         """
+
+        if board is None:
+            board = copy(self.board)
 
         # TODO
         pass
 
-    def calculate_legal_moves_for_pawn(self, pawn, only_jumps=False):
+    def calculate_legal_moves_for_pawn(self, pawn, only_jumps=False, board=None, already_found_moves=[],
+                                       org_pawn=None):
         """
         Returns all squares that a given pawn can move to
+
+        For jumps it is triggered recursively. already_found_moves are then list of the moves from previous
+            iteration and org_pawn are just the coordinates of the original pawn
         """
         # i.e. pawn = [9, 4] so it is position_int
 
-        pawn_figure = self.board[pawn[0], pawn[1]]
+        if board is None:
+            board = copy(self.board)
+
+        pawn_figure = board[pawn[0], pawn[1]]
 
         if pawn_figure not in self.legal_figures:
             raise Exception("wrong figure selected")
@@ -115,8 +128,8 @@ class Position:
         legal_moves_for_pawn = []
 
         for direction in directions_to_look_for_moves:
-            pawn_distance_to_closest = distance_to_closest(pawn, direction)
-            if pawn_distance_to_closest > 1:
+            pawn_distance_to_closest = self.distance_to_closest(pawn, direction, board)
+            if pawn_distance_to_closest > 1:  # a pawn can move to this direction, there is no wall nor other pawn on the very next tile
                 next_place_for_pawn = next_place(pawn, direction)
                 if not only_jumps:
                     move = [pawn[0], pawn[1], next_place_for_pawn[0], next_place_for_pawn[1]]
@@ -127,7 +140,7 @@ class Position:
                     continue
 
                 closest_other_pawn = next_place(next_place_for_pawn, direction, pawn_distance_to_closest)
-                pawn_distance_to_next = distance_to_closest(closest_other_pawn, direction)
+                pawn_distance_to_next = self.distance_to_closest(closest_other_pawn, direction, board)  # is there another pawn that will prevent us from jumping?
 
                 if pawn_distance_to_next > pawn_distance_to_closest:
                     next_place_for_pawn_jump = next_place(pawn, 2 * pawn_distance_to_closest)
@@ -135,9 +148,24 @@ class Position:
                         continue
 
                     # jump is legal
-                    move = [pawn[0], pawn[1], next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]]
+                    move = [org_pawn[0], org_pawn[1], next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]]
+
+                    for move_i in already_found_moves:
+                        if move_i[2] == move[2] and move_i[3] == move[3]:
+                            continue  # go to the next direction
 
                     legal_moves_for_pawn.append(move)
+
+                    # next jumps recursive:
+                    board_after_move = copy(board)
+                    board_after_move[pawn[0], pawn[1]], board_after_move[next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]] = board_after_move[next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]], board_after_move[pawn[0], pawn[1]]
+
+                    next_jumps_for_pawn = self.calculate_legal_moves_for_pawn(pawn, only_jumps=True,
+                                                                              board=board_after_move,
+                                                                              already_found_moves=legal_moves_for_pawn)
+
+                    for move_i in next_jumps_for_pawn:
+                        legal_moves_for_pawn.append(move_i)
 
         return legal_moves_for_pawn
 
