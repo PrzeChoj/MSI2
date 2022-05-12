@@ -7,14 +7,14 @@ from .utilities import *
 class Position:
     def __init__(self):
         self.shapes = {0: u'\u00B7',  # empty place
-                       1: '\033[92m' + u'\u25A1' + '\033[0m',  # white/green square
-                       2: '\033[92m' + u'\u25B3' + '\033[0m',  # white/green triangle
-                       3: '\033[92m' + u'\u25CB' + '\033[0m',  # white/green circle
-                       4: '\033[92m' + u'\u25C7' + '\033[0m',  # white/green dimond
-                       5: '\033[94m' + u'\u25C6' + '\033[0m',  # black/blue dimond
-                       6: '\033[94m' + u'\u25C9' + '\033[0m',  # black/blue circle
-                       7: '\033[94m' + u'\u25BC' + '\033[0m',  # black/blue triangle
-                       8: '\033[94m' + u'\u25A0' + '\033[0m',  # black/blue square
+                       1: '\033[92m' + u'\u25A1' + '\033[0m',  # Player1/green square
+                       2: '\033[92m' + u'\u25B3' + '\033[0m',  # Player1/green triangle
+                       3: '\033[92m' + u'\u25CB' + '\033[0m',  # Player1/green circle
+                       4: '\033[92m' + u'\u25C7' + '\033[0m',  # Player1/green dimond
+                       5: '\033[94m' + u'\u25C6' + '\033[0m',  # Player2/blue dimond
+                       6: '\033[94m' + u'\u25C9' + '\033[0m',  # Player2/blue circle
+                       7: '\033[94m' + u'\u25BC' + '\033[0m',  # Player2/blue triangle
+                       8: '\033[94m' + u'\u25A0' + '\033[0m',  # Player2/blue square
                        9: u'\u002A',  # Possible move
                        }
         self.board = self.get_starting_board()
@@ -28,6 +28,9 @@ class Position:
 
     @staticmethod
     def get_starting_board():
+        """
+        Zwraca startową pozycję. Funkcja statyczna
+        """
         empty_middle = np.array([[0, 0, 0, 0, 0, 0, 0, 0] for _ in range(8)])
         starting_white = np.array([[2, 3, 4, 1, 4, 3, 1, 2]])
         starting_black = 9 - starting_white
@@ -39,6 +42,10 @@ class Position:
         return starting_board
 
     def draw_board(self, draw_coordinates=True):
+        """
+        Ryzuje pozycje. Bierze pod uwagę czyj jest ruch. Jeśli jakaś bierka jest
+            wybrana (czyli self.selected_pawn is not None), to rysuje * w miejscu gdzie ona może się ruszyć
+        """
         move_str = "Green" if self.move_green else "Blue"
         print(f"Now move: " + move_str, end="\n\n")
 
@@ -49,7 +56,7 @@ class Position:
         if self.selected_pawn is not None:
             print(f"Pawn selected: " + position_int_to_str(self.selected_pawn))
 
-            legal_moves_for_pawn = self.calculate_legal_moves_for_pawn(self.selected_pawn)
+            legal_moves_for_pawn = self.calculate_legal_moves_for_pawn(self.selected_pawn)  # TODO(self.calculate_legal_moves_for_pawn jeszcze nie działa poprawnie)
             for pos in legal_moves_for_pawn:
                 board[pos[2], pos[3]] = 9  # change 0 into 9
 
@@ -63,10 +70,13 @@ class Position:
         if draw_coordinates:
             print("  ABCDEFGH")
 
-    def select_pawn(self, position):
+    def select_pawn(self, position_str):
+        """
+        zaznacza wybraną bierkę. Przy rysowaniu self.draw_board będą oznaczone jej możliwe ruchy
+        """
         self.board[self.board == 9] = 0
 
-        position_int = position_str_to_int(position)
+        position_int = position_str_to_int(position_str)
 
         if not self.board[position_int[0], position_int[1]] in self.legal_figures:
             raise Exception("wrong figure selected")
@@ -75,18 +85,19 @@ class Position:
 
     def calculate_possible_moves(self):
         """
-        Returns a list off all possible moves for every pawn in int form
+        Zwraca listę wszystkich możliwych ruchów dla wszystkich bierek w stylu int.
         """
 
         pass  # TODO
 
     def distance_to_closest(self, pawn, direction, board=None):
         """
-        returns the distance from a pawn to other pawn the closest to the pawn in a given direction.
-        If the pawn is at the edge, returns 0.
-        If there is no other pawn up to the border, returns 20
+        Zwraca jak długa jest odległość z bierki do innej w wybranym kierunku.
+        Jeśli następne pole w danym kierunku jest poza planszą, zwórć 0.
+        Jeśli w danym kierunku niema innych bierek aż do ściany, ale następne pole w danym kierunku
+            NIE jest poza planszą, zwórć 0., zwróć 20
 
-        direction: 0 - up, 1 - up-right 2 - right, ..., 7 - up-left
+        możliwe kierunki direction: 0 - up, 1 - up-right 2 - right, ..., 7 - up-left
         """
 
         if board is None:
@@ -98,15 +109,23 @@ class Position:
     def calculate_legal_moves_for_pawn(self, pawn, only_jumps=False, board=None, already_found_moves=[],
                                        org_pawn=None):
         """
-        Returns all squares that a given pawn can move to
+        Zwraca listę możliwych ruchów dla danej bierki w stylu int. Lista ta zawiera cały ruch, czyli
+            współrzędne punktu jak i pola docelowe.
 
-        For jumps it is triggered recursively. already_found_moves are then list of the moves from previous
-            iteration and org_pawn are just the coordinates of the original pawn
+        Wywułuje się rekurencyjnie dla obliczania skoków. Wtedy only_jumps == True, board jest zmodyfikowana,
+            already_found_moves jest listą róchów już znalezionych. Jeśli trafił w pole w którym już był,
+            to przerywa rekurencję. org_pawn to współrzędne z którego pionek zaczął skoki i
+            jest inny niż None w rekurencji. Użyty jest do poprawnego zapisu.
+
+        Jest nieotestowana, bo trzeba najpierw zaimplementować funkcję self.distance_to_closest() oraz
+            funkcję next_place(), co jeszcze się nie stało.
         """
         # i.e. pawn = [9, 4] so it is position_int
 
         if board is None:
             board = copy(self.board)
+        if org_pawn is None:
+            org_pawn = pawn
 
         pawn_figure = board[pawn[0], pawn[1]]
 
@@ -150,9 +169,11 @@ class Position:
                     # jump is legal
                     move = [org_pawn[0], org_pawn[1], next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]]
 
+                    if org_pawn[0] == move[2] and org_pawn[1] == move[3]:
+                        continue  # go to the next direction, this place was the starting position
                     for move_i in already_found_moves:
                         if move_i[2] == move[2] and move_i[3] == move[3]:
-                            continue  # go to the next direction
+                            continue  # go to the next direction, this place was already found
 
                     legal_moves_for_pawn.append(move)
 
@@ -170,6 +191,10 @@ class Position:
         return legal_moves_for_pawn
 
     def is_move_legal(self, move_ints):
+        """
+        Funkcja wywoływana gdy user będzie próbował się ruszyć. Pewnie będzie się sprowadzać do sprawdzenia,
+            czy move_ints jest w self.legal_moves, albo jakoś tak
+        """
         if self.board[move_ints[0], move_ints[1]] not in self.legal_figures:
             print("Bad figure selected. Select your figure")
             return False
@@ -181,12 +206,13 @@ class Position:
 
         return True
 
-    def make_move(self, move):
-        # i.e. move = "A9B8"
-        move = move_str_to_int(move)
-        # i.e. move = [9, 0, 8, 1]
+    def make_move(self, move_str):
+        """
+        Zamienia bierkię i puste pole na planszy
+        """
+        move = move_str_to_int(move_str)
 
-        if not self.is_move_legal(move):
+        if not self.is_move_legal(move):  # TODO(Jeszcze nie działa)
             return
 
         # swap pawn with empty space
@@ -200,21 +226,25 @@ class Position:
         self.moves_made += 0.5
 
         self.selected_pawn = None
-        self.board[self.board == 9] = 0
+        self.board[self.board == 9] = 0  # usuwa stare zapisy możliwych ruchów
 
         self.check_is_terminal()
 
     def check_is_terminal(self):
+        """
+        Sprawdza, czy któremuś graczowi udało się już wygrać
+        """
         if self.moves_made < 1:
             return False
 
-        if np.all(self.board[0] != 0):
-            print("White won!")
+        # Gdy niema bierki, to jest tam albo 0, albo 9
+        if np.all(np.logical_or(self.board[0] != 0, self.board[0] != 9)):
+            print("Green won!")
             self.is_terminal = True
             return True
 
-        if np.all(self.board[9] != 0):
-            print("Black won!")
+        if np.all(np.logical_or(self.board[9] != 0, self.board[9] != 9)):
+            print("Blue won!")
             self.is_terminal = True
             return True
 
