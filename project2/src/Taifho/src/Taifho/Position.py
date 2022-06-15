@@ -1,5 +1,6 @@
 import numpy as np
-from copy import copy
+from copy import copy, deepcopy
+from itertools import chain
 
 from .utilities import *
 
@@ -21,10 +22,10 @@ class Position:
         self.moves_made = 0
         self.move_green = True  # Green True, Blue False
         self.is_terminal = False
+        self.legal_figures = [1, 2, 3, 4]
         self.legal_moves = []
         self.calculate_possible_moves()  # overwrite self.legal_moves
         self.selected_pawn = None
-        self.legal_figures = [1, 2, 3, 4]
 
     @staticmethod
     def get_starting_board():
@@ -56,7 +57,7 @@ class Position:
         if self.selected_pawn is not None:
             print(f"Pawn selected: " + position_int_to_str(self.selected_pawn))
 
-            legal_moves_for_pawn = self.calculate_legal_moves_for_pawn(self.selected_pawn)  # TODO(self.calculate_legal_moves_for_pawn jeszcze nie działa poprawnie)
+            legal_moves_for_pawn = self.calculate_legal_moves_for_pawn(self.selected_pawn)
             for pos in legal_moves_for_pawn:
                 board[pos[2], pos[3]] = 9  # change 0 into 9
 
@@ -79,7 +80,8 @@ class Position:
         position_int = position_str_to_int(position_str)
 
         if not self.board[position_int[0], position_int[1]] in self.legal_figures:
-            raise Exception("wrong figure selected")
+            print("Wrong figure selected. Select your figure")
+            return
 
         self.selected_pawn = position_int
 
@@ -87,24 +89,33 @@ class Position:
         """
         Zwraca listę wszystkich możliwych ruchów dla wszystkich bierek w stylu int.
         """
-
-        pass  # TODO
+        legal_moves = []
+        for fig in self.legal_figures:
+            pawns = np.where(self.board == fig)
+            for i in range(0, len(pawns)):
+                legal_moves_for_pawn = self.calculate_legal_moves_for_pawn([pawns[0][i], pawns[1][i]])
+                legal_moves.append(legal_moves_for_pawn)
+        self.legal_moves = list(chain.from_iterable(legal_moves))
 
     def distance_to_closest(self, pawn, direction, board=None):
         """
-        Zwraca jak długa jest odległość z bierki do innej w wybranym kierunku.
-        Jeśli następne pole w danym kierunku jest poza planszą, zwórć 0.
+        Zwraca jak duża jest odległość z bierki do innej w wybranym kierunku.
+        Jeśli następne pole w danym kierunku jest poza planszą, zwróć 0.
         Jeśli w danym kierunku niema innych bierek aż do ściany, ale następne pole w danym kierunku
-            NIE jest poza planszą, zwórć 0., zwróć 20
+            NIE jest poza planszą, zwróć 20.
 
         możliwe kierunki direction: 0 - up, 1 - up-right 2 - right, ..., 7 - up-left
         """
-
         if board is None:
             board = copy(self.board)
-
-        # TODO
-        pass
+        if next_place(pawn, direction) is None:
+            return 0
+        for step in range(1, 11):
+            new_place = next_place(pawn, direction, step)
+            if new_place is None:
+                return 20
+            if board[new_place[0], new_place[1]] not in [0, 9]:
+                return step
 
     def calculate_legal_moves_for_pawn(self, pawn, only_jumps=False, board=None, already_found_moves=[],
                                        org_pawn=None):
@@ -144,26 +155,27 @@ class Position:
         elif pawn_figure in [7]:
             directions_to_look_for_moves = [0, 3, 5]
 
-        legal_moves_for_pawn = []
+        legal_moves_for_pawn = copy(already_found_moves)  # for the recursive, there are
 
         for direction in directions_to_look_for_moves:
             pawn_distance_to_closest = self.distance_to_closest(pawn, direction, board)
-            if pawn_distance_to_closest > 1:  # a pawn can move to this direction, there is no wall nor other pawn on the very next tile
+            if pawn_distance_to_closest > 1 and not only_jumps:  # a pawn can move to this direction, there is no wall nor other pawn on the very next tile
                 next_place_for_pawn = next_place(pawn, direction)
-                if not only_jumps:
-                    move = [pawn[0], pawn[1], next_place_for_pawn[0], next_place_for_pawn[1]]
+                move = [pawn[0], pawn[1], next_place_for_pawn[0], next_place_for_pawn[1]]
 
-                    legal_moves_for_pawn.append(move)
+                legal_moves_for_pawn.append(move)
 
-                if pawn_distance_to_closest > 10:  # there is no other pawn to jump over
+            if pawn_distance_to_closest >= 1:  # there may be possible jump in this direction
+                if pawn_distance_to_closest == 20:  # there is no other pawn to jump over
                     continue
-
-                closest_other_pawn = next_place(next_place_for_pawn, direction, pawn_distance_to_closest)
+                closest_other_pawn = next_place(pawn, direction, pawn_distance_to_closest)
+                if closest_other_pawn is None:  # the board has ended, cannot jump out of bounds
+                    continue
                 pawn_distance_to_next = self.distance_to_closest(closest_other_pawn, direction, board)  # is there another pawn that will prevent us from jumping?
 
                 if pawn_distance_to_next > pawn_distance_to_closest:
-                    next_place_for_pawn_jump = next_place(pawn, 2 * pawn_distance_to_closest)
-                    if next_place_for_pawn_jump is None:  # the board has ended
+                    next_place_for_pawn_jump = next_place(pawn, direction, 2 * pawn_distance_to_closest)
+                    if next_place_for_pawn_jump is None:  # the board has ended, cannot jump out of bounds; this happens when pawn_distance_to_next == 20
                         continue
 
                     # jump is legal
@@ -171,40 +183,42 @@ class Position:
 
                     if org_pawn[0] == move[2] and org_pawn[1] == move[3]:
                         continue  # go to the next direction, this place was the starting position
+                    to_add = True
                     for move_i in already_found_moves:
                         if move_i[2] == move[2] and move_i[3] == move[3]:
-                            continue  # go to the next direction, this place was already found
+                            to_add = False
+                            break  # go to the next direction, this place was already found
+
+                    if not to_add:  # go to the next direction, this place was already found
+                        continue
 
                     legal_moves_for_pawn.append(move)
 
                     # next jumps recursive:
-                    board_after_move = copy(board)
+                    board_after_move = deepcopy(board)
                     board_after_move[pawn[0], pawn[1]], board_after_move[next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]] = board_after_move[next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]], board_after_move[pawn[0], pawn[1]]
 
-                    next_jumps_for_pawn = self.calculate_legal_moves_for_pawn(pawn, only_jumps=True,
+                    next_jumps_for_pawn = self.calculate_legal_moves_for_pawn(next_place_for_pawn_jump, only_jumps=True,
                                                                               board=board_after_move,
-                                                                              already_found_moves=legal_moves_for_pawn)
+                                                                              already_found_moves=legal_moves_for_pawn,
+                                                                              org_pawn=org_pawn)
 
-                    for move_i in next_jumps_for_pawn:
-                        legal_moves_for_pawn.append(move_i)
+                    for i in range(len(legal_moves_for_pawn), len(next_jumps_for_pawn)):  # the next_jumps_for_pawn starts with legal_moves_for_pawn and then there are new moves
+                        legal_moves_for_pawn.append(next_jumps_for_pawn[i])
 
         return legal_moves_for_pawn
 
     def is_move_legal(self, move_ints):
         """
-        Funkcja wywoływana gdy user będzie próbował się ruszyć. Pewnie będzie się sprowadzać do sprawdzenia,
-            czy move_ints jest w self.legal_moves, albo jakoś tak
+        Funkcja wywoływana gdy user będzie próbował się ruszyć. Sprowadza się do sprawdzenia, czy move_ints jest w self.legal_moves
         """
         if self.board[move_ints[0], move_ints[1]] not in self.legal_figures:
-            print("Bad figure selected. Select your figure")
+            print("Wrong figure selected. Select your figure")
             return False
-        if not self.board[move_ints[2], move_ints[3]] in [0, 9]:
+        if self.board[move_ints[2], move_ints[3]] not in [0, 9]:
             print("Destination field is occupied. Select other field")
             return False
-
-        # TODO(Czy mogę tak się ruszyć? Typy figur; Skoki)
-
-        return True
+        return move_ints in self.legal_moves
 
     def make_move(self, move_str):
         """
@@ -212,7 +226,8 @@ class Position:
         """
         move = move_str_to_int(move_str)
 
-        if not self.is_move_legal(move):  # TODO(Jeszcze nie działa)
+        if not self.is_move_legal(move):
+            print("The selected move is not allowed. Select other move")
             return
 
         # swap pawn with empty space
@@ -224,6 +239,7 @@ class Position:
         self.move_green = not self.move_green
         self.legal_figures = [1, 2, 3, 4] if self.move_green else [5, 6, 7, 8]
         self.moves_made += 0.5
+        self.calculate_possible_moves()
 
         self.selected_pawn = None
         self.board[self.board == 9] = 0  # usuwa stare zapisy możliwych ruchów
@@ -236,16 +252,12 @@ class Position:
         """
         if self.moves_made < 1:
             return False
-
-        # Gdy niema bierki, to jest tam albo 0, albo 9
-        if np.all(np.logical_or(self.board[0] != 0, self.board[0] != 9)):
+        if np.all(np.logical_and(self.board[0] != 0, self.board[0] != 9)):
             print("Green won!")
             self.is_terminal = True
             return True
-
-        if np.all(np.logical_or(self.board[9] != 0, self.board[9] != 9)):
+        if np.all(np.logical_and(self.board[9] != 0, self.board[9] != 9)):
             print("Blue won!")
             self.is_terminal = True
             return True
-
         return False
