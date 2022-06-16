@@ -1,4 +1,5 @@
 from random import randint
+import time
 
 from Taifho import *
 
@@ -78,8 +79,9 @@ while choice != "q":
                         break
             else:
                 # na ten moment napisane dla losowego silnika
+                time.sleep(1)
                 position.calculate_possible_moves()
-                engine_move = randint(0, len(position.legal_moves))
+                engine_move = randint(0, len(position.legal_moves)-1)
                 position.make_move(move_int_to_str(position.legal_moves[engine_move]))
             end_game = position.check_is_terminal()
             selected_pawn = ""
