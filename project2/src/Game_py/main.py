@@ -45,7 +45,7 @@ while choice != "q":
             position.draw_board()
             if position.get_actual_player() == color:
                 while selected_pawn == "":
-                    selected_pawn = input("\nSelect pawn to make a move by entering letter and number denoting the position (np. A1): ")
+                    selected_pawn = input("\nSelect pawn to make a move by entering letter and number denoting the position (eg. A1): ")
                     if not position.select_pawn(selected_pawn):
                         selected_pawn = ""
                         continue
