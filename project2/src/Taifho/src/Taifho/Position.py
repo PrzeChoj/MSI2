@@ -27,6 +27,15 @@ class Position:
         self.calculate_possible_moves()  # overwrite self.legal_moves
         self.selected_pawn = None
 
+    def get_actual_player(self):
+        """
+        Zwraca 1 gdy aktualny ruch należy do zielonego gracza, 2 gdy do niebieskiego
+        """
+        if self.move_green:
+            return 1
+        else:
+            return 2
+
     @staticmethod
     def get_starting_board():
         """
@@ -65,11 +74,11 @@ class Position:
             if draw_coordinates:
                 print(line_num, end="|")
             for point in board[line_num]:
-                print(self.shapes[point], end="")
+                print(self.shapes[point], end=" ")
             print("")
 
         if draw_coordinates:
-            print("  ABCDEFGH")
+            print("  A B C D E F G H")
 
     def select_pawn(self, position_str):
         """
@@ -81,9 +90,10 @@ class Position:
 
         if not self.board[position_int[0], position_int[1]] in self.legal_figures:
             print("Wrong figure selected. Select your figure")
-            return
+            return False
 
         self.selected_pawn = position_int
+        return True
 
     def calculate_possible_moves(self):
         """
