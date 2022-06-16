@@ -80,11 +80,15 @@ class Position:
         if draw_coordinates:
             print("  A B C D E F G H")
 
-    def select_pawn(self, position_str):
+    def select_pawn(self, position_str=None):
         """
         zaznacza wybraną bierkę. Przy rysowaniu self.draw_board będą oznaczone jej możliwe ruchy
         """
         self.board[self.board == 9] = 0
+
+        if position_str is None:
+            self.selected_pawn = None
+            return None  # TODO(Make sure I can return None here)
 
         position_int = position_str_to_int(position_str)
 
@@ -254,20 +258,22 @@ class Position:
         self.selected_pawn = None
         self.board[self.board == 9] = 0  # usuwa stare zapisy możliwych ruchów
 
-        self.check_is_terminal()
+        self.check_is_terminal(print_who_won = False)
 
-    def check_is_terminal(self):
+    def check_is_terminal(self, print_who_won=True):
         """
         Sprawdza, czy któremuś graczowi udało się już wygrać
         """
         if self.moves_made < 1:
             return False
         if np.all(np.logical_and(self.board[0] != 0, self.board[0] != 9)):
-            print("Green won!")
+            if print_who_won:
+                print("Green won!")
             self.is_terminal = True
             return True
         if np.all(np.logical_and(self.board[9] != 0, self.board[9] != 9)):
-            print("Blue won!")
+            if print_who_won:
+                print("Blue won!")
             self.is_terminal = True
             return True
         return False

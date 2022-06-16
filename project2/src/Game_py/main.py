@@ -65,6 +65,8 @@ while choice != "q":
                             move_choice = ""
                             continue
                         if move_choice == 1:
+                            position.select_pawn()  # unselect pawn
+                            position.draw_board()
                             selected_pawn = ""
                             break
                         else:
@@ -82,12 +84,18 @@ while choice != "q":
                 time.sleep(1)
                 position.calculate_possible_moves()
                 engine_move = randint(0, len(position.legal_moves)-1)
+                print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move])[0] +
+                      move_int_to_str(position.legal_moves[engine_move])[1] + " goes to " +
+                      move_int_to_str(position.legal_moves[engine_move])[2] +
+                      move_int_to_str(position.legal_moves[engine_move])[3], end="")
                 position.make_move(move_int_to_str(position.legal_moves[engine_move]))
             end_game = position.check_is_terminal()
             selected_pawn = ""
             position_to_move = ""
             move_choice = ""
             move = []
+
+        position.draw_board()  # Draw board after the winning
 
     elif choice == "q":
 
