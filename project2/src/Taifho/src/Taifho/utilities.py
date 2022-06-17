@@ -7,7 +7,8 @@ from copy import copy
 # Pierwszy int reprezentuje wiersz, drugi kolumnę, czyli drugi tłumaczy się na literę.
 # ALE litery pisze się jako pierwsze
 
-#ToDo - zrobić sprawdzanie czy podane argumenty są poprawne i można zrobić zrzutowanie!!!
+# ToDo - zrobić sprawdzanie czy podane argumenty są poprawne i można zrobić zrzutowanie!!!
+
 
 def move_str_to_int(move_str):
     """

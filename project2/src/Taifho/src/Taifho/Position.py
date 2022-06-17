@@ -1,5 +1,5 @@
 import numpy as np
-from copy import copy, deepcopy
+from copy import deepcopy
 from itertools import chain
 
 from .utilities import *
@@ -131,8 +131,7 @@ class Position:
             if board[new_place[0], new_place[1]] not in [0, 9]:
                 return step
 
-    def calculate_legal_moves_for_pawn(self, pawn, only_jumps=False, board=None, already_found_moves=[],
-                                       org_pawn=None):
+    def calculate_legal_moves_for_pawn(self, pawn, only_jumps=False, board=None, already_found_moves=[], org_pawn=None):
         """
         Zwraca listę możliwych ruchów dla danej bierki w stylu int. Lista ta zawiera cały ruch, czyli
             współrzędne punktu jak i pola docelowe.
@@ -258,7 +257,7 @@ class Position:
         self.selected_pawn = None
         self.board[self.board == 9] = 0  # usuwa stare zapisy możliwych ruchów
 
-        self.check_is_terminal(print_who_won = False)
+        self.check_is_terminal(print_who_won=False)
 
     def check_is_terminal(self, print_who_won=True):
         """
