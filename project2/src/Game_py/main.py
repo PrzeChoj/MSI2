@@ -32,6 +32,10 @@ while choice != "q":
         print("[1] Random engine")
         print("[2] MCTS + UCT engine (TODO)")  # TODO(zmienić nazwy zgodnie z planowanymi silnikami)
         print("[3] MCTS + PUCT engine (TODO)")
+        print("[4] MCTS + UCT engine + h heuristic (TODO)")
+        print("[5] MCTS + PUCT engine + h heuristic (TODO)")
+        print("[6] MCTS + UCT engine + h_G heuristic (TODO)")
+        print("[7] MCTS + PUCT engine + h_G heuristic (TODO)")
         while engine == "":
             try:
                 engine = int(input("\nSelect engine type of your enemy in Taifho: "))
@@ -39,7 +43,7 @@ while choice != "q":
                 print("\nWrong value selected.")
                 engine = ""
                 continue
-            if engine not in [1, 2, 3]:  # TODO(ustawić tyle liczb ile trzeba)
+            if engine not in [1, 2, 3, 4, 5, 6, 7]:  # TODO(ustawić tyle liczb ile trzeba)
                 print("\nWrong number selected.")
                 engine = ""
                 continue
@@ -111,10 +115,19 @@ while choice != "q":
                     engine_move = randint(0, len(position.legal_moves)-1)
                 else:  # TODO(Teraz coś się dzieje dziwnego. Zmienna leaf w 38 linii jest klsy Node, ale w 109 jest klasy list...)
                     node = make_Node_from_Position(position)  # TODO(Paula, zerknij, czy mogę tak to zrobić)
+                    # TODO(Dać userowi możliwość wyboru parametrów C, depth, G)
                     if engine == 2:
-                        engine_mcts = MCTS(C=math.sqrt(2), selection_type="UCT")  # TODO(Dać userowi możliwość wyboru parametrów)
-                    elif engine == 3:
+                        engine_mcts = MCTS(C=math.sqrt(2), selection_type="UCT")
+                    if engine == 3:
                         engine_mcts = MCTS(C=math.sqrt(2), selection_type="PUCT")
+                    elif engine == 4:
+                        engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="UCT", depth=5)
+                    elif engine == 5:
+                        engine_mcts = MCTS_with_heuristic_h_G(C=math.sqrt(2), selection_type="UCT", depth=5, G=2)
+                    elif engine == 6:
+                        engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="PUCT", depth=5)
+                    elif engine == 7:
+                        engine_mcts = MCTS_with_heuristic_h_G(C=math.sqrt(2), selection_type="PUCT", depth=5, G=2)
                     else:
                         raise Exception("Wrong Engine")
                     max_time = 3  # TODO(3 sekundy? Powinien być to parametr)
