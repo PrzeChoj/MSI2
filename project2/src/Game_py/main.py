@@ -23,18 +23,33 @@ while choice != "q":
         position_to_move = ""
         move_choice = ""
         move = []
+        engine = ""
         print("\n\t\t\t\tStarting the game...\n")
+        print("[1] Random engine")
+        print("[2] MCTS + UCT engine")  # TODO(zmienić nazwy zgodnie z planowanymi silnikami)
+        print("[3] MCTS + PUCT engine")
+        while engine == "":
+            try:
+                engine = int(input("\nSelect engine type of your enemy in Taifho: "))
+            except:
+                print("\nWrong value selected.")
+                engine = ""
+                continue
+            if engine not in [1, 2, 3]:  # TODO(ustawić tyle liczb ile trzeba)
+                print("\nWrong number selected.")
+                engine = ""
+                continue
         print("[1] Green (starting player)")
         print("[2] Blue")
         while color == "":
             try:
                 color = int(input("\nSelect your pawns' color: "))
             except:
-                print("\nWrong value.")
+                print("\nWrong value selected.")
                 color = ""
                 continue
             if color not in [1, 2]:
-                print("\nWrong numer.")
+                print("\nWrong numer selected.")
                 color = ""
         position = Position()
         end_game = position.check_is_terminal()
@@ -60,10 +75,10 @@ while choice != "q":
                         try:
                             move_choice = int(input("Select what do you want to do now: "))
                         except:
-                            print("\nWrong value.")
+                            print("\nWrong value selected.")
                             continue
                         if move_choice not in [1, 2]:
-                            print("\nWrong number.")
+                            print("\nWrong number selected.")
                             move_choice = ""
                             continue
                         if move_choice == 1:
@@ -89,12 +104,17 @@ while choice != "q":
                 # na ten moment napisane dla losowego silnika
                 time.sleep(1)
                 position.calculate_possible_moves()
-                engine_move = randint(0, len(position.legal_moves)-1)
-                print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move])[0] +
-                      move_int_to_str(position.legal_moves[engine_move])[1] + " goes to " +
-                      move_int_to_str(position.legal_moves[engine_move])[2] +
-                      move_int_to_str(position.legal_moves[engine_move])[3], end="")
-                position.make_move(move_int_to_str(position.legal_moves[engine_move]))
+                if engine == 1:
+                    engine_move = randint(0, len(position.legal_moves)-1)
+                    print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move])[0] +
+                          move_int_to_str(position.legal_moves[engine_move])[1] + " goes to " +
+                          move_int_to_str(position.legal_moves[engine_move])[2] +
+                          move_int_to_str(position.legal_moves[engine_move])[3], end="")
+                    position.make_move(move_int_to_str(position.legal_moves[engine_move]))
+                elif engine == 2:
+                    pass  # TODO()
+                elif engine == 3:
+                    pass  # TODO()
             end_game = position.check_is_terminal()
             selected_pawn = ""
             position_to_move = ""
