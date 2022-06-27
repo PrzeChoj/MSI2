@@ -1,5 +1,6 @@
 from string import ascii_lowercase as alphabet
 from copy import copy
+import re
 
 # Kroki (move) i pozycje (position) są zapisywane na 2 sposoby. Sposób str, to nais długości 4 dla move i 2 dla position
 # sposób int to tablica intów dłógości 4 dla move i 2 dla position.
@@ -7,14 +8,14 @@ from copy import copy
 # Pierwszy int reprezentuje wiersz, drugi kolumnę, czyli drugi tłumaczy się na literę.
 # ALE litery pisze się jako pierwsze
 
-# ToDo - zrobić sprawdzanie czy podane argumenty są poprawne i można zrobić zrzutowanie!!!
-
 
 def move_str_to_int(move_str):
     """
     move_str_to_int("D9D8") == [9, 3, 8, 3]
     move_str_to_int("A9B8") == [9, 0, 8, 1]
     """
+    assert (re.match(re.compile("^([A-H][0-9])+"), move_str))
+
     move_str = move_str.lower()
     move_start_letter = ord(move_str[0]) - 97  # not 96, cos we want a -> 0
     move_start_number = int(move_str[1])
@@ -27,6 +28,9 @@ def move_int_to_str(move_int):
     """
     move_int_to_str([9, 3, 8, 3]) == "D9D8"
     """
+    assert (move_int[0] >= 0 and move_int[0] <= 9 and move_int[1] >= 0 and move_int[1] <= 7)
+    assert (move_int[2] >= 0 and move_int[2] <= 9 and move_int[3] >= 0 and move_int[3] <= 7)
+
     move_str = "" + alphabet[move_int[1]] + str(move_int[0]) + alphabet[move_int[3]] + str(move_int[2])
     return move_str.upper()
 
@@ -35,6 +39,8 @@ def position_str_to_int(position_str):
     """
     position_str_to_int("D9") == [9, 3]
     """
+    assert (re.match(re.compile("^([A-H][0-9])"), position_str))
+
     position_str = position_str.lower()
     position_letter = ord(position_str[0]) - 97  # not 96, cos we want a -> 0
     position_number = int(position_str[1])
@@ -45,6 +51,8 @@ def position_int_to_str(position_int):
     """
     position_int_to_str([9, 3]) == "D9"
     """
+    assert (position_int[0] >= 0 and position_int[0] <= 9 and position_int[1] >= 0 and position_int[1] <= 7)
+
     position_str = "" + alphabet[position_int[1]] + str(position_int[0])
     return position_str.upper()
 

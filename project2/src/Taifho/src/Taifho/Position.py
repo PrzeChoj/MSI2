@@ -26,6 +26,7 @@ class Position:
         self.legal_moves = []
         self.calculate_possible_moves()  # overwrite self.legal_moves
         self.selected_pawn = None
+        self.winner = None
 
     def get_actual_player(self):
         """
@@ -101,7 +102,7 @@ class Position:
 
     def calculate_possible_moves(self):
         """
-        Zwraca listę wszystkich możliwych ruchów dla wszystkich bierek w stylu int.
+        Tworzy listę wszystkich możliwych ruchów dla wszystkich bierek w stylu int. Nie zwraca nic.
         """
         legal_moves = []
         for fig in self.legal_figures:
@@ -269,10 +270,12 @@ class Position:
             if print_who_won:
                 print("Green won!")
             self.is_terminal = True
+            self.winner = True
             return True
         if np.all(np.logical_and(self.board[9] != 0, self.board[9] != 9)):
             if print_who_won:
                 print("Blue won!")
             self.is_terminal = True
+            self.winner = False
             return True
         return False
