@@ -109,17 +109,25 @@ while choice != "q":
                 if engine == 1:
                     time.sleep(1)
                     engine_move = randint(0, len(position.legal_moves)-1)
-                elif engine == 2:
-                    raise Exception("Engine not yet available")  # TODO()
-                    # node = make_Node_from_Position(position)  # TODO(Czy mogę tak to zrobić?)
-                    # engine_mcts = MCTS(C=math.sqrt(2), selection_type="UCT")
-                    # engine_mcts.do_rollout(node)  # TODO(To powinno być w pentli, która sprawdza ile czasu zajęło i czy mamy czas na jeszcze jedno)
-                    # engine_move = engine_mcts.choose_move(node)  # TODO(To powinno zwracać int)
-                elif engine == 3:
-                    raise Exception("Engine not yet available")
-                    pass  # TODO()
-                else:
-                    raise Exception("Wrong Engine")
+                else:  # TODO(Teraz coś się dzieje dziwnego. Zmienna leaf w 38 linii jest klsy Node, ale w 109 jest klasy list...)
+                    node = make_Node_from_Position(position)  # TODO(Paula, zerknij, czy mogę tak to zrobić)
+                    if engine == 2:
+                        engine_mcts = MCTS(C=math.sqrt(2), selection_type="UCT")  # TODO(Dać userowi możliwość wyboru parametrów)
+                    elif engine == 3:
+                        engine_mcts = MCTS(C=math.sqrt(2), selection_type="PUCT")
+                    else:
+                        raise Exception("Wrong Engine")
+                    max_time = 3  # TODO(3 sekundy? Powinien być to parametr)
+                    num_of_rollouts = 0
+                    start_time = time.time()
+                    while True:
+                        engine_mcts.do_rollout(node)
+                        num_of_rollouts += 1
+                        now_time = time.time()
+                        sum_time = now_time - start_time  # this is float number
+                        if sum_time + 2 * sum_time/num_of_rollouts > max_time:
+                            break
+                    engine_move = engine_mcts.choose_move(node)  # TODO(To powinno zwracać int)
 
                 print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move])[0] +
                       move_int_to_str(position.legal_moves[engine_move])[1] + " goes to " +

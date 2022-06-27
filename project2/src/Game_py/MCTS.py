@@ -1,4 +1,5 @@
 import math
+from collections import defaultdict
 
 from Node import Node
 
@@ -6,8 +7,8 @@ from Node import Node
 class MCTS:
     def __init__(self, C=math.sqrt(2), selection_type="UCT"):
         self.C = C
-        self.Q = dict(int)  # total reward of each node
-        self.N = dict(int)  # number of visits for each node
+        self.Q = defaultdict(int)  # total reward of each node
+        self.N = defaultdict(int)  # number of visits for each node
         self.children = dict()  # children for each node
         self.selection_type = selection_type
 
@@ -29,7 +30,7 @@ class MCTS:
     def do_rollout(self, node) -> None:
         """Make the tree one layer better. (Train for one iteration.)"""
         path = self._select(node)
-        leaf = path[-1]
+        leaf = path[-1]  # This is named leaf, because we will be the leaf in the tree of visited nodes, but not necessarily the leaf in the tree of the game
         self._expand(leaf)
         result = self._simulate(leaf)
         self._backpropagate(path, result)
@@ -99,7 +100,7 @@ class MCTS:
         self.children[node] = node.find_children()
 
     def _simulate(self, node):
-        """Returns the result for a random simulation of `node`"""
+        """Returns the result for a random simulation from `node`"""
         invert_result = True
         while True:
             if node.is_leaf():
