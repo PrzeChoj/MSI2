@@ -1,17 +1,18 @@
 import math
 
-from .Node import Node
+from Node import Node
+
 
 class MCTS:
-    def __init__(self, C = math.sqrt(2), selection_type = "UCT"):
+    def __init__(self, C=math.sqrt(2), selection_type="UCT"):
         self.C = C
-        self.Q = dict(int) # total reward of each node
-        self.N = dict(int) # number of visits for each node
-        self.children = dict() # children for each node
+        self.Q = dict(int)  # total reward of each node
+        self.N = dict(int)  # number of visits for each node
+        self.children = dict()  # children for each node
         self.selection_type = selection_type
 
     def choose_move(self, node) -> Node:
-        "Choose the best successor of node -> choose a move in the game"
+        """Choose the best successor of node -> choose a move in the game"""
         if node.is_leaf():
             raise RuntimeError(f"choose called on leaf node {node}. No more moves available!")
 
@@ -26,7 +27,7 @@ class MCTS:
         return max(self.children[node], key=score)
 
     def do_rollout(self, node) -> None:
-        "Make the tree one layer better. (Train for one iteration.)"
+        """Make the tree one layer better. (Train for one iteration.)"""
         path = self._select(node)
         leaf = path[-1]
         self._expand(leaf)
@@ -34,11 +35,11 @@ class MCTS:
         self._backpropagate(path, result)
 
     def _select(self, node) -> list:
-        "Find an unexplored descendent of `node`"
+        """Find an unexplored descendent of `node`"""
         path = []
         while True:
             path.append(node)
-            if node not in self.children or not self.children[node]: # node is either unexplored or leaf
+            if node not in self.children or not self.children[node]:  # node is either unexplored or leaf
                 return path
             unexplored = self.children[node] - self.children.keys()
             if unexplored:
@@ -56,7 +57,7 @@ class MCTS:
         """
         Select a child of node using UCT selection method with no modification
         """
-        assert all(n in self.children for n in self.children[node]) # all children of node should already be expanded
+        assert all(n in self.children for n in self.children[node])  # all children of node should already be expanded
         log_N_vertex = math.log(self.N[node])
 
         def uct(a):
@@ -71,7 +72,7 @@ class MCTS:
         """
         Select a child of node using UCT selection method
         """
-        assert all(n in self.children for n in self.children[node]) # all children of node should already be expanded
+        assert all(n in self.children for n in self.children[node])  # all children of node should already be expanded
         if len(node.find_children()) <= 1:
             return node.find_children()
 
@@ -84,7 +85,7 @@ class MCTS:
             """
             def m(N, a):
                 if N > 1:
-                    2 / M[a] * math.sqrt( math.log(N) / N )
+                    2 / M[a] * math.sqrt(math.log(N) / N)
                 else:
                     return 2 / M[a]
             return self.Q[a] / self.N[a] + self.C * math.sqrt(log_N_vertex / self.N[a]) - m(self.N[a], a)
@@ -92,13 +93,14 @@ class MCTS:
         return max(self.children[node], key=puct)
 
     def _expand(self, node) -> None:
-        "Update the `children` dict with the children of `node`"
+        """Update the `children` dict with the children of `node`"""
         if node in self.children:
             return  # already expanded
         self.children[node] = node.find_children()
 
-    def _simulate(self, node):
-        "Returns the result for a random simulation of `node`"
+    @staticmethod
+    def _simulate(node):
+        """Returns the result for a random simulation of `node`"""
         invert_result = True
         while True:
             if node.is_leaf():
