@@ -24,9 +24,9 @@ class Position:
         self.is_terminal = False
         self.legal_figures = [1, 2, 3, 4]
         self.legal_moves = []
+        self.winner = None
         self.calculate_possible_moves()  # overwrite self.legal_moves
         self.selected_pawn = None
-        self.winner = None
 
     def get_actual_player(self):
         """

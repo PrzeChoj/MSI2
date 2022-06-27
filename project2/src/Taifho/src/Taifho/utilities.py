@@ -14,7 +14,7 @@ def move_str_to_int(move_str):
     move_str_to_int("D9D8") == [9, 3, 8, 3]
     move_str_to_int("A9B8") == [9, 0, 8, 1]
     """
-    assert (re.match(re.compile("^([A-H][0-9])+"), move_str))
+    assert (re.match(re.compile("^([a-hA-H][0-9])+"), move_str))
 
     move_str = move_str.lower()
     move_start_letter = ord(move_str[0]) - 97  # not 96, cos we want a -> 0
@@ -39,7 +39,7 @@ def position_str_to_int(position_str):
     """
     position_str_to_int("D9") == [9, 3]
     """
-    assert (re.match(re.compile("^([A-H][0-9])"), position_str))
+    assert (re.match(re.compile("^([a-hA-H][0-9])"), position_str))
 
     position_str = position_str.lower()
     position_letter = ord(position_str[0]) - 97  # not 96, cos we want a -> 0
