@@ -1,5 +1,6 @@
 from random import randint
 import math
+import numpy as np
 
 from Taifho import *
 
@@ -29,11 +30,35 @@ class Node(Position):
 
     def h(self):
         "Wynik gry liczony za pomocą heurystyki h, niekoniecznie na podstawie zakończonej planszy"
-        pass
+        sum_player = 0
+        sum_enemy = 0
+        if self.legal_figures == [1, 2, 3, 4]:
+            for fig in self.legal_figures:
+                pawns = np.where(self.board == fig)
+                for i in range(0, len(pawns)):
+                     sum_player += 9 - pawns[0][i]
+        else:
+            for fig in [5, 6, 7, 8]:
+                pawns = np.where(self.board == fig)
+                for i in range(0, len(pawns)):
+                     sum_enemy += pawns[0][i]
+        return sum_player - sum_enemy
 
-    def h_G(self):
+    def h_G(self, G = 2):
         "Wynik gry liczony za pomocą heurystyki h_G, niekoniecznie na podstawie zakończonej planszy"
-        pass
+        sum_player = 0
+        sum_enemy = 0
+        if self.legal_figures == [1, 2, 3, 4]:
+            for fig in self.legal_figures:
+                pawns = np.where(self.board == fig)
+                for i in range(0, len(pawns)):
+                    sum_player += (9 - pawns[0][i]) * math.log(9 + G) / math.log((9 - pawns[0][i]) + G)
+        else:
+            for fig in [5, 6, 7, 8]:
+                pawns = np.where(self.board == fig)
+                for i in range(0, len(pawns)):
+                    sum_enemy += pawns[0][i] * math.log(9 + G) / math.log(pawns[0][i] + G)
+        return sum_player - sum_enemy
 
     def find_random_child(self):
         "Znajduje losowe dziecko dla węzła, czyli losową nowa dostępną pozycję z aktualnej planszy"
@@ -53,7 +78,10 @@ class Node(Position):
                     distance[a] = - (a[2] - a[0])
                 else:
                     distance[a] = a[2] - a[0]
-            # ToDo - przeskalować wartości w D do odpowiedniego przedziału
+            max_d = max(distance.values())
+            min_d = min(distance.values())
+            for a in self.legal_moves:
+                distance[a] = (distance[a] - min_d) / (max_d - min_d) * (1-1/K - 1/K**3) + 1/K**3  # skalowanie do odpowiedniego przedziału
             return distance
         D = distance_from_start()
         for a in self.legal_moves:
