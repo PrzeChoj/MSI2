@@ -98,15 +98,14 @@ class MCTS:
             return  # already expanded
         self.children[node] = node.find_children()
 
-    @staticmethod
-    def _simulate(node):
+    def _simulate(self, node):
         """Returns the result for a random simulation of `node`"""
         invert_result = True
         while True:
             if node.is_leaf():
                 result = node.result()
                 if invert_result:
-                    return 1 - result
+                    return self._invert_result(result)
                 else:
                     return result
             node = node.find_random_child()
@@ -119,4 +118,56 @@ class MCTS:
         for node in reversed(path):
             self.N[node] += 1
             self.Q[node] += result
-            result = 1 - result
+            result = self._invert_result(result)
+
+    def _invert_result(self, result):
+        """
+        The result of the game is 0 or 1.
+        From the opponent perspective, the result is 1 - result
+        """
+        return 1 - result
+
+
+class MCTS_with_heuristic_h(MCTS):
+    def __init__(self, C=math.sqrt(2), selection_type="UCT", depth=5):
+        super().__init__(C, selection_type)
+        self.depth = depth
+
+    def _invert_result(self, result):
+        """
+        The result of the game is real number from the heuristic.
+        From the opponent perspective, the result is - result
+        """
+        return - result
+
+    def _simulate(self, node):
+        """Returns the result for a random simulation of `node`"""
+        invert_result = True
+        for i in range(self.depth):  # this line is changed from super()._simulate()
+            if node.is_leaf():
+                result = node.h()  # this line is changed from super()._simulate()
+                if invert_result:
+                    return self._invert_result(result)
+                else:
+                    return result
+            node = node.find_random_child()
+            invert_result = not invert_result
+
+
+class MCTS_with_heuristic_h_G(MCTS_with_heuristic_h):
+    def __init__(self, C=math.sqrt(2), selection_type="UCT", depth=5, G=2):
+        super().__init__(C, selection_type, depth)
+        self.G = G
+
+    def _simulate(self, node):
+        """Returns the result for a random simulation of `node`"""
+        invert_result = True
+        for i in range(self.depth):
+            if node.is_leaf():
+                result = node.h_G(self.G)  # this line is changed from super()._simulate()
+                if invert_result:
+                    return self._invert_result(result)
+                else:
+                    return result
+            node = node.find_random_child()
+            invert_result = not invert_result
