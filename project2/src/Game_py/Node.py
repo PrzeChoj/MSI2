@@ -1,5 +1,6 @@
 from random import randint
 import math
+from copy import deepcopy
 import numpy as np
 
 from Taifho import *
@@ -9,8 +10,12 @@ class Node(Position):
     def find_children(self):
         """Zwraca wszystkie dzieci węzła, czyli wszystkie dostępne pozycje z aktualnej planszy"""
         if self.is_terminal:
-            return []
-        return self.legal_moves
+            return set()
+        children = set()
+        for i in range(0, len(self.legal_moves)):
+            position = deepcopy(self)
+            children.add(position.make_move(move_int_to_str(self.legal_moves[i])))
+        return children
 
     def is_leaf(self):
         """Zwraca True jeśli dziecko jest węzeł nie ma dzieci, czyli gdy nie można wykonać już więcej ruchów z danej pozycji planszy"""
@@ -66,7 +71,8 @@ class Node(Position):
         """Znajduje losowe dziecko dla węzła, czyli losową nowa dostępną pozycję z aktualnej planszy"""
         if self.is_terminal:
             return None
-        return self.legal_moves[randint(0, len(self.legal_moves)-1)]
+        self.make_move(move_int_to_str(self.legal_moves[randint(0, len(self.legal_moves) - 1)]))
+        return self
 
     def calculate_weight(self):
         """Oblicza wagi M do algorytmu PUCT dla każdego dziecka i zwraca w postaci słownika {dziecko = waga}"""

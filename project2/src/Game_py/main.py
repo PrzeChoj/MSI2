@@ -1,4 +1,3 @@
-import math
 from random import randint
 import time
 import re
@@ -28,6 +27,10 @@ while choice != "q":
         move_choice = ""
         move = []
         engine = ""
+        C = ""
+        max_time = ""
+        G = ""
+        depth = ""
         print("\n\t\t\t\tStarting the game...\n")
         print("[1] Random engine")
         print("[2] MCTS + UCT engine (TODO)")  # TODO(zmienić nazwy zgodnie z planowanymi silnikami)
@@ -47,6 +50,37 @@ while choice != "q":
                 print("\nWrong number selected.")
                 engine = ""
                 continue
+        if engine != 1:
+            while C == "":
+                try:
+                    C = int(input("\nSelect C value for UCT: "))
+                except:
+                    print("\nWrong value selected.")
+                    C = ""
+                    continue
+            while max_time == "":
+                try:
+                    max_time = int(input("\nSelect maximum time for each move for engine: "))
+                except:
+                    print("\nWrong value selected.")
+                    max_time = ""
+                    continue
+        if engine in [5, 7]:   # TODO(ustawić zgodnie z wybranymi silnikami)
+            while G == "":
+                try:
+                    G = int(input("\nSelect C value for UCT: "))
+                except:
+                    print("\nWrong value selected.")
+                    G = ""
+                    continue
+        if engine > 3:
+            while depth == "":
+                try:
+                    depth = int(input("\nSelect maximum time for each move for engine: "))
+                except:
+                    print("\nWrong value selected.")
+                    depth = ""
+                    continue
         print("[1] Green (starting player)")
         print("[2] Blue")
         while color == "":
@@ -113,24 +147,21 @@ while choice != "q":
                 if engine == 1:
                     time.sleep(1)
                     engine_move = randint(0, len(position.legal_moves)-1)
-                else:  # TODO(Teraz coś się dzieje dziwnego. Zmienna leaf w 38 linii jest klsy Node, ale w 109 jest klasy list...)
-                    node = make_Node_from_Position(position)  # TODO(Paula, zerknij, czy mogę tak to zrobić)
-                    # TODO(Dać userowi możliwość wyboru parametrów C, depth, G)
+                else:
+                    node = make_Node_from_Position(position)
+                    engine_mcts = None
                     if engine == 2:
-                        engine_mcts = MCTS(C=math.sqrt(2), selection_type="UCT")
-                    if engine == 3:
-                        engine_mcts = MCTS(C=math.sqrt(2), selection_type="PUCT")
+                        engine_mcts = MCTS(C=C, selection_type="UCT")
+                    elif engine == 3:
+                        engine_mcts = MCTS(C=C, selection_type="PUCT")
                     elif engine == 4:
-                        engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="UCT", depth=5)
+                        engine_mcts = MCTS_with_heuristic_h(C=C, selection_type="UCT", depth=depth)
                     elif engine == 5:
-                        engine_mcts = MCTS_with_heuristic_h_G(C=math.sqrt(2), selection_type="UCT", depth=5, G=2)
+                        engine_mcts = MCTS_with_heuristic_h_G(C=C, selection_type="UCT", depth=depth, G=G)
                     elif engine == 6:
-                        engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="PUCT", depth=5)
+                        engine_mcts = MCTS_with_heuristic_h(C=C, selection_type="PUCT", depth=depth)
                     elif engine == 7:
-                        engine_mcts = MCTS_with_heuristic_h_G(C=math.sqrt(2), selection_type="PUCT", depth=5, G=2)
-                    else:
-                        raise Exception("Wrong Engine")
-                    max_time = 3  # TODO(3 sekundy? Powinien być to parametr)
+                        engine_mcts = MCTS_with_heuristic_h_G(C=C, selection_type="PUCT", depth=depth, G=G)
                     num_of_rollouts = 0
                     start_time = time.time()
                     while True:

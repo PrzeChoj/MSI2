@@ -15,7 +15,7 @@ class MCTS:
     def choose_move(self, node) -> Node:
         """Choose the best successor of node -> choose a move in the game"""
         if node.is_leaf():
-            raise RuntimeError(f"choose called on leaf node {node}. No more moves available!")
+            raise RuntimeError(f"choose called on leaf node. No more moves available!")
 
         if node not in self.children:
             return node.find_random_child()
@@ -31,13 +31,13 @@ class MCTS:
         """Make the tree one layer better. (Train for one iteration.)"""
         path = self._select(node)
         leaf = path[-1]  # This is named leaf, because we will be the leaf in the tree of visited nodes, but not necessarily the leaf in the tree of the game
-        self._expand(leaf)
+        self._expand(leaf)  # ToDO(doszło do NoneType i wywaliło błąd)
         result = self._simulate(leaf)
         self._backpropagate(path, result)
 
     def _select(self, node) -> list:
         """Find an unexplored descendent of `node`"""
-        path = []
+        path = [Node]
         while True:
             path.append(node)
             if node not in self.children or not self.children[node]:  # node is either unexplored or leaf
@@ -130,6 +130,7 @@ class MCTS:
 
 
 class MCTS_with_heuristic_h(MCTS):
+
     def __init__(self, C=math.sqrt(2), selection_type="UCT", depth=5):
         super().__init__(C, selection_type)
         self.depth = depth
@@ -154,8 +155,8 @@ class MCTS_with_heuristic_h(MCTS):
             node = node.find_random_child()
             invert_result = not invert_result
 
-
 class MCTS_with_heuristic_h_G(MCTS_with_heuristic_h):
+
     def __init__(self, C=math.sqrt(2), selection_type="UCT", depth=5, G=2):
         super().__init__(C, selection_type, depth)
         self.G = G
