@@ -16,7 +16,7 @@ class Node(Position):
         """Zwraca True jeśli dziecko jest węzeł nie ma dzieci, czyli gdy nie można wykonać już więcej ruchów z danej pozycji planszy"""
         return self.is_terminal
 
-    def result(self):  # TODO(Zrobic ja poprawnie)
+    def result(self):
         """Zwraca wynik gry. 0-przegrana, 1-wygrana"""
         if not self.is_terminal:
             raise RuntimeError(f"Result called on nonterminal board!")
@@ -91,3 +91,18 @@ class Node(Position):
             weight = math.exp(1 / K * D[a]) / sum([math.exp(1 / K * D[i]) for i in self.legal_moves])
             M[a] = weight
         return M
+
+
+def make_Node_from_Position(position):
+    node = Node()
+
+    node.board = position.board
+    node.moves_made = position.moves_made
+    node.move_green = position.move_green
+    node.is_terminal = position.is_terminal
+    node.legal_figures = position.legal_figures
+    node.legal_moves = position.legal_moves
+    node.winner = position.winner
+    node.selected_pawn = position.selected_pawn
+
+    return node

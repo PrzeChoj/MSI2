@@ -24,7 +24,7 @@ class MCTS:
                 return float("-inf")  # avoid unseen moves
             return self.Q[a] / self.N[a]  # average reward
 
-        return max(self.children[node], key=score)
+        return max(self.children[node], key=score)  # TODO(To jest następny node, a my chcemy int, numer ruchu)
 
     def do_rollout(self, node) -> None:
         """Make the tree one layer better. (Train for one iteration.)"""

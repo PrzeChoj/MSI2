@@ -1,8 +1,12 @@
+import math
 from random import randint
 import time
 import re
 
 from Taifho import *
+
+from MCTS import MCTS, MCTS_with_heuristic_h, MCTS_with_heuristic_h_G
+from Node import make_Node_from_Position
 
 print("\t*************************************************")
 print("\n\t\t\t\tWelcome to Taifho Game!\n")
@@ -101,24 +105,27 @@ while choice != "q":
                             position.make_move(selected_pawn + position_to_move)
                         break
             else:
-                # na ten moment napisane dla losowego silnika
                 position.calculate_possible_moves()
                 if engine == 1:
                     time.sleep(1)
                     engine_move = randint(0, len(position.legal_moves)-1)
-                    print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move])[0] +
-                          move_int_to_str(position.legal_moves[engine_move])[1] + " goes to " +
-                          move_int_to_str(position.legal_moves[engine_move])[2] +
-                          move_int_to_str(position.legal_moves[engine_move])[3], end="")
-                    position.make_move(move_int_to_str(position.legal_moves[engine_move]))
                 elif engine == 2:
-                    raise Exception("Engine not yet available")
-                    pass  # TODO()
+                    raise Exception("Engine not yet available")  # TODO()
+                    # node = make_Node_from_Position(position)  # TODO(Czy mogę tak to zrobić?)
+                    # engine_mcts = MCTS(C=math.sqrt(2), selection_type="UCT")
+                    # engine_mcts.do_rollout(node)  # TODO(To powinno być w pentli, która sprawdza ile czasu zajęło i czy mamy czas na jeszcze jedno)
+                    # engine_move = engine_mcts.choose_move(node)  # TODO(To powinno zwracać int)
                 elif engine == 3:
                     raise Exception("Engine not yet available")
                     pass  # TODO()
                 else:
                     raise Exception("Wrong Engine")
+
+                print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move])[0] +
+                      move_int_to_str(position.legal_moves[engine_move])[1] + " goes to " +
+                      move_int_to_str(position.legal_moves[engine_move])[2] +
+                      move_int_to_str(position.legal_moves[engine_move])[3], end="")
+                position.make_move(move_int_to_str(position.legal_moves[engine_move]))
             end_game = position.check_is_terminal()
             selected_pawn = ""
             position_to_move = ""
