@@ -104,6 +104,8 @@ class Position:
         """
         Tworzy listę wszystkich możliwych ruchów dla wszystkich bierek w stylu int. Nie zwraca nic.
         """
+        if self.winner is not None:
+            self.legal_moves = []
         legal_moves = []
         for fig in self.legal_figures:
             pawns = np.where(self.board == fig)

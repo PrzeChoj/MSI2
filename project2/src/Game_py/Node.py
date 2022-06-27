@@ -16,7 +16,7 @@ class Node(Position):
         "Zwraca True jeśli dziecko jest węzeł nie ma dzieci, czyli gdy nie można wykonać już więcej ruchów z danej pozycji planszy"
         return self.is_terminal
 
-    def result(self):
+    def result(self):  # TODO(Zrobic ja poprawna)
         "Zwraca wynik gry"
         if not self.is_terminal:
             raise RuntimeError(f"Result called on nonterminal board!")

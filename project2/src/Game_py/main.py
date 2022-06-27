@@ -1,10 +1,8 @@
 from random import randint
 import time
+import re
 
 from Taifho import *
-
-# ToDo - zrobić sprawdzanie czy podane argumenty figury i ruchu są poprawne i można zrobić zrzutowanie!!! Tutaj lub w pakiecie!
-# ToDo -popakować to w funkcje, aby było czytelniej
 
 print("\t*************************************************")
 print("\n\t\t\t\tWelcome to Taifho Game!\n")
@@ -46,6 +44,10 @@ while choice != "q":
             if position.get_actual_player() == color:
                 while selected_pawn == "":
                     selected_pawn = input("\nSelect pawn to make a move by entering letter and number denoting the position (eg. A1): ")
+                    if not re.match(re.compile("^([A-H][0-9])"), selected_pawn):
+                        print("The wrong value has been entered. Select your figure")
+                        selected_pawn = ""
+                        continue
                     if not position.select_pawn(selected_pawn):
                         selected_pawn = ""
                         continue
@@ -61,7 +63,7 @@ while choice != "q":
                             print("\nWrong value.")
                             continue
                         if move_choice not in [1, 2]:
-                            print("\nWrong numer.")
+                            print("\nWrong number.")
                             move_choice = ""
                             continue
                         if move_choice == 1:
@@ -72,6 +74,10 @@ while choice != "q":
                         else:
                             while position_to_move == "":
                                 position_to_move = input("Select new position for pawn: ")
+                                if not re.match(re.compile("^([A-H][0-9])"), position_to_move):
+                                    print("The wrong value has been entered. Enter proper position")
+                                    position_to_move = ""
+                                    continue
                                 move = [*position_str_to_int(selected_pawn), *position_str_to_int(position_to_move)]
                                 if not position.is_move_legal(move):
                                     print("Wrong position. Try again.")

@@ -30,8 +30,8 @@ class MCTS:
         path = self._select(node)
         leaf = path[-1]
         self._expand(leaf)
-        reward = self._simulate(leaf)
-        self._backpropagate(path, reward)
+        result = self._simulate(leaf)
+        self._backpropagate(path, result)
 
     def _select(self, node) -> list:
         "Find an unexplored descendent of `node`"
@@ -69,7 +69,7 @@ class MCTS:
 
     def _puct_selection(self, node) -> Node:
         """
-        Select a child of node using UCT selection method with no modification
+        Select a child of node using UCT selection method
         """
         assert all(n in self.children for n in self.children[node]) # all children of node should already be expanded
         if len(node.find_children()) <= 1:
