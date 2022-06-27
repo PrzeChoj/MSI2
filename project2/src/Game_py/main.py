@@ -33,12 +33,12 @@ while choice != "q":
         depth = ""
         print("\n\t\t\t\tStarting the game...\n")
         print("[1] Random engine")
-        print("[2] MCTS + UCT engine (TODO)")  # TODO(zmienić nazwy zgodnie z planowanymi silnikami)
-        print("[3] MCTS + PUCT engine (TODO)")
-        print("[4] MCTS + UCT engine + h heuristic (TODO)")
-        print("[5] MCTS + PUCT engine + h heuristic (TODO)")
-        print("[6] MCTS + UCT engine + h_G heuristic (TODO)")
-        print("[7] MCTS + PUCT engine + h_G heuristic (TODO)")
+        print("[2] MCTS + UCT engine")
+        print("[3] MCTS + PUCT engine")
+        print("[4] MCTS + UCT engine + h heuristic")
+        print("[5] MCTS + PUCT engine + h heuristic")
+        print("[6] MCTS + UCT engine + h_G heuristic")
+        print("[7] MCTS + PUCT engine + h_G heuristic")
         while engine == "":
             try:
                 engine = int(input("\nSelect engine type of your enemy in Taifho: "))
@@ -46,7 +46,7 @@ while choice != "q":
                 print("\nWrong value selected.")
                 engine = ""
                 continue
-            if engine not in [1, 2, 3, 4, 5, 6, 7]:  # TODO(ustawić tyle liczb ile trzeba)
+            if engine not in [1, 2, 3, 4, 5, 6, 7]:
                 print("\nWrong number selected.")
                 engine = ""
                 continue
@@ -65,7 +65,7 @@ while choice != "q":
                     print("\nWrong value selected.")
                     max_time = ""
                     continue
-        if engine in [5, 7]:   # TODO(ustawić zgodnie z wybranymi silnikami)
+        if engine in [5, 7]:
             while G == "":
                 try:
                     G = int(input("\nSelect C value for UCT: "))
