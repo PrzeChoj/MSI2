@@ -103,8 +103,8 @@ while choice != "q":
                 print("\nWrong numer selected.")
                 color = ""
         position = Position()
-        end_game = position.check_is_terminal()
-        while not end_game:
+        print("\n\n\t\t\t\t\tStart Game!")
+        while not position.check_is_terminal(print_who_won=False):
             print("\n")
             position.draw_board()
             if position.get_actual_player() == color:
@@ -153,7 +153,7 @@ while choice != "q":
                         break
             else:
                 position.calculate_possible_moves()
-                print("Engine thinks: ...")
+                print("\nEngine thinks: ...")
                 if engine == 1:
                     time.sleep(1)
                     engine_move_int = randint(0, len(position.legal_moves)-1)
@@ -188,7 +188,7 @@ while choice != "q":
                         if position.legal_moves[i] == engine_move_move:
                             engine_move_int = i
 
-                print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move_int])[0] +
+                print("\nEngine moved " + move_int_to_str(position.legal_moves[engine_move_int])[0] +
                       move_int_to_str(position.legal_moves[engine_move_int])[1] + " goes to " +
                       move_int_to_str(position.legal_moves[engine_move_int])[2] +
                       move_int_to_str(position.legal_moves[engine_move_int])[3], end="")
@@ -199,7 +199,12 @@ while choice != "q":
             move_choice = ""
             move = []
 
+        print(f"\n\t{position.winner} won!\n")  # Print who win
         position.draw_board()  # Draw board after the winning
+
+        print("\n\t*************************************************")
+        print("\n\t\t\t\t\t\tEnd Game!\n")
+        print("\t*************************************************\n")
 
     elif choice == "q":
 

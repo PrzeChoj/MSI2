@@ -38,7 +38,7 @@ class MCTS:
 
     def _select(self, node) -> list:
         """Find an unexplored descendent of `node`"""
-        path = []  # TODO(Paula, dlaczego tu było `path = [Node]`? Widzę, że dodałaś to w commicie `02a8bf2f`, ale nie wiem dlaczego... Wydaje mi się, że jednak powinno być `path = []`)
+        path = []
         while True:
             path.append(node)
             if node not in self.children or not self.children[node]:  # node is either unexplored or leaf

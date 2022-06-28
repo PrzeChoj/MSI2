@@ -29,8 +29,14 @@ def move_int_to_str(move_int):
     """
     move_int_to_str([9, 3, 8, 3]) == "D9D8"
     """
-    assert (move_int[0] >= 0 and move_int[0] <= 9 and move_int[1] >= 0 and move_int[1] <= 7)
-    assert (move_int[2] >= 0 and move_int[2] <= 9 and move_int[3] >= 0 and move_int[3] <= 7)
+    assert (move_int[0] >= 0)
+    assert (move_int[0] <= 9)
+    assert (move_int[1] >= 0)
+    assert (move_int[1] <= 7)
+    assert (move_int[2] >= 0)
+    assert (move_int[2] <= 9)
+    assert (move_int[3] >= 0)
+    assert (move_int[3] <= 7)
 
     move_str = "" + alphabet[move_int[1]] + str(move_int[0]) + alphabet[move_int[3]] + str(move_int[2])
     return move_str.upper()
@@ -52,7 +58,10 @@ def position_int_to_str(position_int):
     """
     position_int_to_str([9, 3]) == "D9"
     """
-    assert (position_int[0] >= 0 and position_int[0] <= 9 and position_int[1] >= 0 and position_int[1] <= 7)
+    assert (position_int[0] >= 0)
+    assert (position_int[0] <= 9)
+    assert (position_int[1] >= 0)
+    assert (position_int[1] <= 7)
 
     position_str = "" + alphabet[position_int[1]] + str(position_int[0])
     return position_str.upper()

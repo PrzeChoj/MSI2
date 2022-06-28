@@ -57,8 +57,9 @@ class Position:
         Ryzuje pozycje. Bierze pod uwagę czyj jest ruch. Jeśli jakaś bierka jest
             wybrana (czyli self.selected_pawn is not None), to rysuje * w miejscu gdzie ona może się ruszyć
         """
-        move_str = "Green" if self.move_green else "Blue"
-        print(f"Now move: " + move_str, end="\n\n")
+        if self.winner is not None:
+            move_str = "Green" if self.move_green else "Blue"
+            print(f"Now move: " + move_str, end="\n\n")
 
         self.board[self.board == 9] = 0
 
@@ -270,13 +271,13 @@ class Position:
             return False
         if np.all(np.logical_and(self.board[0] != 0, self.board[0] != 9)):
             if print_who_won:
-                print("Green won!")
+                print("\nGreen won!")
             self.is_terminal = True
             self.winner = True
             return True
         if np.all(np.logical_and(self.board[9] != 0, self.board[9] != 9)):
             if print_who_won:
-                print("Blue won!")
+                print("\nBlue won!")
             self.is_terminal = True
             self.winner = False
             return True
