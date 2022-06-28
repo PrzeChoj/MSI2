@@ -36,8 +36,8 @@ while choice != "q":
         print("[2] MCTS + UCT engine")
         print("[3] MCTS + PUCT engine")
         print("[4] MCTS + UCT engine + h heuristic")
-        print("[5] MCTS + PUCT engine + h heuristic")
-        print("[6] MCTS + UCT engine + h_G heuristic")
+        print("[5] MCTS + UCT engine + h_G heuristic")
+        print("[6] MCTS + PUCT engine + h heuristic")
         print("[7] MCTS + PUCT engine + h_G heuristic")
         while engine == "":
             try:
@@ -53,32 +53,40 @@ while choice != "q":
         if engine != 1:
             while C == "":
                 try:
-                    C = int(input("\nSelect C value for UCT: "))
+                    C = float(input("\nSelect C value for UCT: "))
+                    if C <= 0:
+                        raise Exception("C has to be strictly bigger than 0")
                 except:
-                    print("\nWrong value selected.")
+                    print("\nWrong value selected. C has to be positive real number.")
                     C = ""
                     continue
             while max_time == "":
                 try:
-                    max_time = int(input("\nSelect maximum time for each move for engine: "))
+                    max_time = float(input("\nSelect maximum time for each move for engine: "))
+                    if max_time <= 0:
+                        raise Exception("max_time has to be strictly bigger than 0")
                 except:
-                    print("\nWrong value selected.")
+                    print("\nWrong value selected. maximum time has to be positive real number.")
                     max_time = ""
                     continue
         if engine in [5, 7]:
             while G == "":
                 try:
-                    G = int(input("\nSelect C value for UCT: "))
+                    G = float(input("\nSelect G value for UCT: "))
+                    if G <= 1:
+                        raise Exception("G has to be strictly bigger than 1")
                 except:
-                    print("\nWrong value selected.")
+                    print("\nWrong value selected. G has to be real number strictly bigger tan 1.")
                     G = ""
                     continue
         if engine > 3:
             while depth == "":
                 try:
-                    depth = int(input("\nSelect maximum time for each move for engine: "))
+                    depth = int(input("\nSelect maximum depth of simulation for engine: "))
+                    if depth <= 0:
+                        raise Exception("depth has to be strictly bigger than 0")
                 except:
-                    print("\nWrong value selected.")
+                    print("\nWrong value selected. depth has to be positive integer.")
                     depth = ""
                     continue
         print("[1] Green (starting player)")
@@ -144,6 +152,7 @@ while choice != "q":
                         break
             else:
                 position.calculate_possible_moves()
+                print("Engine thinks: ...")
                 if engine == 1:
                     time.sleep(1)
                     engine_move = randint(0, len(position.legal_moves)-1)
