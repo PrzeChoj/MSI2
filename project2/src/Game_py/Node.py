@@ -85,18 +85,22 @@ class Node(Position):
             distance = dict()
             for a in self.legal_moves:
                 if self.move_green:
-                    distance[a] = - (a[2] - a[0])
+                    distance[move_int_to_str(a)] = - (a[2] - a[0])
                 else:
-                    distance[a] = a[2] - a[0]
+                    distance[move_int_to_str(a)] = a[2] - a[0]
             max_d = max(distance.values())
             min_d = min(distance.values())
-            for a in self.legal_moves:
-                distance[a] = (distance[a] - min_d) / (max_d - min_d) * (1-1/K - 1/K**3) + 1/K**3  # Scale distance into [1/K**3, 1-1/K]
+            if max_d - min_d > 1:
+                for a in self.legal_moves:
+                    distance[move_int_to_str(a)] = (distance[move_int_to_str(a)] - min_d) / (max_d - min_d) * (1-1/K - 1/K**3) + 1/K**3  # Scale distance into [1/K**3, 1-1/K]
+            else:  # every heuristic for a move is the same
+                for a in self.legal_moves:
+                    distance[move_int_to_str(a)] = 1/K**3  # Set every one to equal number 1/K**3
             return distance
         D = distance_from_start()
         for a in self.legal_moves:
-            weight = math.exp(1 / K * D[a]) / sum([math.exp(1 / K * D[i]) for i in self.legal_moves])
-            M[a] = weight
+            weight = math.exp(1 / K * D[move_int_to_str(a)]) / sum([math.exp(1 / K * D[move_int_to_str(i)]) for i in self.legal_moves])
+            M[move_int_to_str(a)] = weight
         return M
 
 

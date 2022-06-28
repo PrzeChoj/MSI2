@@ -17,10 +17,11 @@ choice = " "
 while choice != "q":
 
     print("[1] Start Game!")
+    print("[2] Debug")
     print("[q] Quit.")
     choice = input("\nSelect what do you want to do: ")
 
-    if choice == "1":
+    if choice == "1" or choice == "2":
 
         color = ""
         selected_pawn = ""
@@ -63,7 +64,7 @@ while choice != "q":
                     continue
             while max_time == "":
                 try:
-                    max_time = float(input("\nSelect maximum time for each move for engine: "))
+                    max_time = float(input("\nSelect maximum time for each move for engine (in seconds): "))
                     if max_time <= 0:
                         raise Exception("max_time has to be strictly bigger than 0")
                 except:
@@ -181,7 +182,10 @@ while choice != "q":
                         sum_time = now_time - start_time  # this is float number
                         if sum_time + 2 * sum_time/num_of_rollouts > max_time:
                             break
-                    engine_move_node = engine_mcts.choose_move(node)  # TODO(To powinno zwracać int)
+                    if choice == "2":
+                        print(f"branching factor = {len(engine_mcts.children[node])}")
+                        print(f"num_of_rollouts = {num_of_rollouts}")
+                    engine_move_node = engine_mcts.choose_move(node)
                     engine_move_move = Taifho.which_move_was_made(node.board, engine_move_node.board)
                     engine_move_int = None
                     for i in range(len(position.legal_moves)):
@@ -193,20 +197,12 @@ while choice != "q":
                       move_int_to_str(position.legal_moves[engine_move_int])[2] +
                       move_int_to_str(position.legal_moves[engine_move_int])[3], end="")
                 position.make_move(move_int_to_str(position.legal_moves[engine_move_int]))
-            end_game = position.check_is_terminal()
             selected_pawn = ""
             position_to_move = ""
             move_choice = ""
             move = []
 
-        if position.winner:
-            win = 1
-        else:
-            win = 2
-        if win == color:  # Print who win
-            print(f"\nYou won!\n")
-        else:
-            print(f"\nEngine won!\n")
+        print(f"\n{'You' if position.winner == (color == 1) else 'Engine'} ({'Green' if position.winner else 'Blue'}) won!\n")
         position.draw_board()  # Draw board after the winning
 
         print("\n\t*************************************************")

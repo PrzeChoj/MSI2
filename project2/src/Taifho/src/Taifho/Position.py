@@ -57,7 +57,7 @@ class Position:
         Ryzuje pozycje. Bierze pod uwagę czyj jest ruch. Jeśli jakaś bierka jest
             wybrana (czyli self.selected_pawn is not None), to rysuje * w miejscu gdzie ona może się ruszyć
         """
-        if self.winner is not None:
+        if self.winner is None:
             move_str = "Green" if self.move_green else "Blue"
             print(f"Now move: " + move_str, end="\n\n")
 

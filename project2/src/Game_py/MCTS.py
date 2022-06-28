@@ -1,6 +1,7 @@
 import math
 from collections import defaultdict
 
+from Taifho import move_int_to_str, which_move_was_made
 from Node import Node, make_Node_from_Position
 
 
@@ -25,7 +26,7 @@ class MCTS:
                 return float("-inf")  # avoid unseen moves
             return self.Q[a] / self.N[a]  # average reward
 
-        return max(self.children[node], key=score)  # TODO(To jest następny node, a my chcemy int, numer ruchu)
+        return max(self.children[node], key=score)
 
     def do_rollout(self, node) -> None:
         """Make the tree one layer better. (Train for one iteration.)"""
@@ -87,10 +88,11 @@ class MCTS:
             """
             def m(N, a):
                 if N > 1:
-                    2 / M[a] * math.sqrt(math.log(N) / N)
+                    return 2 / M[move_int_to_str(which_move_was_made(node.board, a.board))] * math.sqrt(math.log(N) / N)
                 else:
-                    return 2 / M[a]
-            return self.Q[a] / self.N[a] + self.C * math.sqrt(log_N_vertex / self.N[a]) - m(self.N[a], a)
+                    return 2 / M[move_int_to_str(which_move_was_made(node.board, a.board))]
+            out = self.Q[a] / self.N[a] + self.C * math.sqrt(log_N_vertex / self.N[a]) - m(self.N[a], a)
+            return out
 
         return max(self.children[node], key=puct)
 
