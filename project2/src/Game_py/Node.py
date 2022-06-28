@@ -1,6 +1,6 @@
 from random import randint
 import math
-from copy import deepcopy
+import copy
 import numpy as np
 
 from Taifho import *
@@ -13,7 +13,7 @@ class Node(Position):
             return set()
         children = set()
         for i in range(0, len(self.legal_moves)):
-            position = deepcopy(self)
+            position = make_Node_from_Position(self)
             children.add(position.make_move(move_int_to_str(self.legal_moves[i])))
         return children
 
@@ -102,13 +102,13 @@ class Node(Position):
 def make_Node_from_Position(position):
     node = Node()
 
-    node.board = position.board
+    node.board = copy.copy(position.board)
     node.moves_made = position.moves_made
     node.move_green = position.move_green
     node.is_terminal = position.is_terminal
-    node.legal_figures = position.legal_figures
-    node.legal_moves = position.legal_moves
+    node.legal_figures = copy.copy(position.legal_figures)
+    node.legal_moves = copy.copy(position.legal_moves)
     node.winner = position.winner
-    node.selected_pawn = position.selected_pawn
+    node.selected_pawn = copy.copy(position.selected_pawn)
 
     return node

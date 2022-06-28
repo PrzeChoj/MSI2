@@ -118,6 +118,9 @@ class MCTS:
         """
         for node in reversed(path):
             self.N[node] += 1
+            print(node)
+            print(self.Q)  # TODO(Why is it empty?)
+            print(result)  # TODO(Why is it None?)
             self.Q[node] += result
             result = self._invert_result(result)
 
