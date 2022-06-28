@@ -14,7 +14,8 @@ class Node(Position):
         children = set()
         for i in range(0, len(self.legal_moves)):
             position = make_Node_from_Position(self)
-            children.add(position.make_move(move_int_to_str(self.legal_moves[i])))
+            position.make_move(move_int_to_str(self.legal_moves[i]))
+            children.add(position)
         return children
 
     def is_leaf(self):

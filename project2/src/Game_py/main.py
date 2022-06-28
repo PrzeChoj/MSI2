@@ -33,8 +33,8 @@ while choice != "q":
         depth = ""
         print("\n\t\t\t\tStarting the game...\n")
         print("[1] Random engine")
-        print("[2] MCTS + UCT engine")
-        print("[3] MCTS + PUCT engine")
+        print("[2] MCTS + UCT engine (as expected: it does not work)")
+        print("[3] MCTS + PUCT engine (as expected: it does not work)")
         print("[4] MCTS + UCT engine + h heuristic")
         print("[5] MCTS + UCT engine + h_G heuristic")
         print("[6] MCTS + PUCT engine + h heuristic")
@@ -180,7 +180,9 @@ while choice != "q":
                         sum_time = now_time - start_time  # this is float number
                         if sum_time + 2 * sum_time/num_of_rollouts > max_time:
                             break
+                    print(f"rollouts made: {num_of_rollouts}")
                     engine_move = engine_mcts.choose_move(node)  # TODO(To powinno zwracać int)
+                    print(engine_move.board)  # TODO(Robi wiecej niż 1 ruch)
 
                 print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move])[0] +
                       move_int_to_str(position.legal_moves[engine_move])[1] + " goes to " +

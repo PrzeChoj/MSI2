@@ -37,7 +37,7 @@ class MCTS:
 
     def _select(self, node) -> list:
         """Find an unexplored descendent of `node`"""
-        path = [Node]
+        path = []  # TODO(Paula, dlaczego tu było `path = [Node]`? Widzę, że dodałaś to w commicie `02a8bf2f`, ale nie wiem dlaczego... Wydaje mi się, że jednak powinno być `path = []`)
         while True:
             path.append(node)
             if node not in self.children or not self.children[node]:  # node is either unexplored or leaf
@@ -100,7 +100,12 @@ class MCTS:
         self.children[node] = node.find_children()
 
     def _simulate(self, node):
-        """Returns the result for a random simulation from `node`"""
+        """
+        Returns the result for a random simulation from `node`
+
+        As expected, it takes over 10 000 iterations to find a leaf with random moves in Taifho game.
+        It is not practical method.
+        """
         invert_result = True
         while True:
             if node.is_leaf():
