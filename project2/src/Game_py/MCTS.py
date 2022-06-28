@@ -31,7 +31,7 @@ class MCTS:
         """Make the tree one layer better. (Train for one iteration.)"""
         path = self._select(node)
         leaf = path[-1]  # This is named leaf, because we will be the leaf in the tree of visited nodes, but not necessarily the leaf in the tree of the game
-        self._expand(leaf)  # ToDO(doszło do NoneType i wywaliło błąd) # TODO(Paula, czy nadal tak masz, bo dużo pozmieniałem i może jeuż jest ok.)
+        self._expand(leaf)
         leaf_copy = make_Node_from_Position(leaf)  # Copy, so that the simulated will not overwrite the expanded board
         result = self._simulate(leaf_copy)
         self._backpropagate(path, result)

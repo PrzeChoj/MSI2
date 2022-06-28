@@ -199,7 +199,14 @@ while choice != "q":
             move_choice = ""
             move = []
 
-        print(f"\n\t{position.winner} won!\n")  # Print who win
+        if position.winner:
+            win = 1
+        else:
+            win = 2
+        if win == color:  # Print who win
+            print(f"\nYou won!\n")
+        else:
+            print(f"\nEngine won!\n")
         position.draw_board()  # Draw board after the winning
 
         print("\n\t*************************************************")
