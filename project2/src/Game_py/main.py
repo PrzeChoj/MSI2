@@ -2,6 +2,7 @@ from random import randint
 import time
 import re
 
+import Taifho
 from Taifho import *
 
 from MCTS import MCTS, MCTS_with_heuristic_h, MCTS_with_heuristic_h_G
@@ -155,7 +156,7 @@ while choice != "q":
                 print("Engine thinks: ...")
                 if engine == 1:
                     time.sleep(1)
-                    engine_move = randint(0, len(position.legal_moves)-1)
+                    engine_move_int = randint(0, len(position.legal_moves)-1)
                 else:
                     node = make_Node_from_Position(position)
                     engine_mcts = None
@@ -180,15 +181,18 @@ while choice != "q":
                         sum_time = now_time - start_time  # this is float number
                         if sum_time + 2 * sum_time/num_of_rollouts > max_time:
                             break
-                    print(f"rollouts made: {num_of_rollouts}")
-                    engine_move = engine_mcts.choose_move(node)  # TODO(To powinno zwracać int)
-                    print(engine_move.board)  # TODO(Robi wiecej niż 1 ruch)
+                    engine_move_node = engine_mcts.choose_move(node)  # TODO(To powinno zwracać int)
+                    engine_move_move = Taifho.which_move_was_made(node.board, engine_move_node.board)
+                    engine_move_int = None
+                    for i in range(len(position.legal_moves)):
+                        if position.legal_moves[i] == engine_move_move:
+                            engine_move_int = i
 
-                print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move])[0] +
-                      move_int_to_str(position.legal_moves[engine_move])[1] + " goes to " +
-                      move_int_to_str(position.legal_moves[engine_move])[2] +
-                      move_int_to_str(position.legal_moves[engine_move])[3], end="")
-                position.make_move(move_int_to_str(position.legal_moves[engine_move]))
+                print("\n\nEngine moved " + move_int_to_str(position.legal_moves[engine_move_int])[0] +
+                      move_int_to_str(position.legal_moves[engine_move_int])[1] + " goes to " +
+                      move_int_to_str(position.legal_moves[engine_move_int])[2] +
+                      move_int_to_str(position.legal_moves[engine_move_int])[3], end="")
+                position.make_move(move_int_to_str(position.legal_moves[engine_move_int]))
             end_game = position.check_is_terminal()
             selected_pawn = ""
             position_to_move = ""

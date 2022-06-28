@@ -1,6 +1,7 @@
 from string import ascii_lowercase as alphabet
 from copy import copy
 import re
+import numpy as np
 
 # Kroki (move) i pozycje (position) są zapisywane na 2 sposoby. Sposób str, to nais długości 4 dla move i 2 dla position
 # sposób int to tablica intów dłógości 4 dla move i 2 dla position.
@@ -86,3 +87,20 @@ def next_place(place, direction, steps=1):
     if new_place[0] < 0 or new_place[0] > 9 or new_place[1] < 0 or new_place[1] > 7:
         return None
     return new_place
+
+
+def which_move_was_made(board_from, board_to):
+    """
+    Gets 2 boards that a half-move from each other (one player has moved)
+    Returns a move that was made in int_form
+    """
+    if np.sum(board_from != board_to) != 2:
+        raise Exception("Wrong boards passed into `which_move_was_made()` function.")
+    differences = np.where(board_from != board_to)  # initial guess of from-to direction
+    move_from = [differences[0][0], differences[1][0]]
+    move_to = [differences[0][1], differences[1][1]]
+
+    if board_from[move_from[0], move_from[1]] in [0, 9]:  # this place was empty, there couldn't be a move from this place
+        move_from, move_to = move_to, move_from
+
+    return [move_from[0], move_from[1], move_to[0], move_to[1]]
