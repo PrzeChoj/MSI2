@@ -1,9 +1,9 @@
 from random import randint
 import time
 import re
+import math
 
 import Taifho
-from Taifho import *
 
 from MCTS import MCTS, MCTS_with_heuristic_h, MCTS_with_heuristic_h_G
 from Node import make_Node_from_Position
@@ -55,7 +55,8 @@ while choice != "q":
         if engine != 1:
             while C == "":
                 try:
-                    C = float(input("\nSelect C value for UCT: "))
+                    C_str = input("\nSelect C value for UCT (press enter for default, sqrt(2)): ")
+                    C = math.sqrt(2) if C_str == "" else float(C_str)
                     if C <= 0:
                         raise Exception("C has to be strictly bigger than 0")
                 except:
@@ -64,7 +65,8 @@ while choice != "q":
                     continue
             while max_time == "":
                 try:
-                    max_time = float(input("\nSelect maximum time for each move for engine (in seconds): "))
+                    max_time_str = input("\nSelect maximum time for each move for engine (in seconds) (press enter for default, 1): ")
+                    max_time = 1 if max_time_str == "" else float(max_time_str)
                     if max_time <= 0:
                         raise Exception("max_time has to be strictly bigger than 0")
                 except:
@@ -74,7 +76,8 @@ while choice != "q":
         if engine in [5, 7]:
             while G == "":
                 try:
-                    G = float(input("\nSelect G value for UCT: "))
+                    G_str = input("\nSelect G value for UCT (press enter for default, 2): ")
+                    G = 2 if G_str == "" else float(G_str)
                     if G <= 1:
                         raise Exception("G has to be strictly bigger than 1")
                 except:
@@ -84,18 +87,20 @@ while choice != "q":
         if engine > 3:
             while depth == "":
                 try:
-                    depth = int(input("\nSelect maximum depth of simulation for engine: "))
+                    depth_str = input("\nSelect maximum depth of simulation for engine (press enter for default, 3): ")
+                    depth = 3 if depth_str == "" else float(depth_str)
                     if depth <= 0:
                         raise Exception("depth has to be strictly bigger than 0")
                 except:
                     print("\nWrong value selected. depth has to be positive integer.")
                     depth = ""
                     continue
-        print("[1] Green (starting player)")
+        print("[1 or enter] Green (starting player)")
         print("[2] Blue")
         while color == "":
             try:
-                color = int(input("\nSelect your pawns' color: "))
+                color_str = input("\nSelect your pawns' color: ")
+                color = 1 if color_str == "" else int(color_str)
             except:
                 print("\nWrong value selected.")
                 color = ""
@@ -103,14 +108,14 @@ while choice != "q":
             if color not in [1, 2]:
                 print("\nWrong numer selected.")
                 color = ""
-        position = Position()
+        position = Taifho.Position()
         print("\n\n\t\t\t\t\tStart Game!")
         while not position.check_is_terminal(print_who_won=False):
             print("\n")
             position.draw_board()
             if position.get_actual_player() == color:
                 while selected_pawn == "":
-                    selected_pawn = input("\nSelect pawn to make a move by entering letter and number denoting the position (eg. A1): ")
+                    selected_pawn = input(f"\nSelect pawn to make a move by entering letter and number denoting the position (eg. {Taifho.position_int_to_str([position.legal_moves[0][0], position.legal_moves[0][1]])}): ")
                     if not re.match(re.compile("^([a-hA-H][0-9])"), selected_pawn):
                         print("The wrong value has been entered. Select your figure")
                         selected_pawn = ""
@@ -122,10 +127,11 @@ while choice != "q":
                     position.draw_board()
                     print("\n")
                     print("[1] Change selected pawn")
-                    print("[2] Make a move")
+                    print("[2 or enter] Make a move")
                     while True:
                         try:
-                            move_choice = int(input("Select what do you want to do now: "))
+                            move_choice_org = input("Select what do you want to do now: ")
+                            move_choice = 2 if move_choice_org == "" else int(move_choice_org)
                         except:
                             print("\nWrong value selected.")
                             continue
@@ -145,7 +151,7 @@ while choice != "q":
                                     print("The wrong value has been entered. Enter proper position")
                                     position_to_move = ""
                                     continue
-                                move = [*position_str_to_int(selected_pawn), *position_str_to_int(position_to_move)]
+                                move = [*Taifho.position_str_to_int(selected_pawn), *Taifho.position_str_to_int(position_to_move)]
                                 if not position.is_move_legal(move):
                                     print("Wrong position. Try again.")
                                     position_to_move = ""
@@ -192,11 +198,11 @@ while choice != "q":
                         if position.legal_moves[i] == engine_move_move:
                             engine_move_int = i
 
-                print("\nEngine moved " + move_int_to_str(position.legal_moves[engine_move_int])[0] +
-                      move_int_to_str(position.legal_moves[engine_move_int])[1] + " goes to " +
-                      move_int_to_str(position.legal_moves[engine_move_int])[2] +
-                      move_int_to_str(position.legal_moves[engine_move_int])[3], end="")
-                position.make_move(move_int_to_str(position.legal_moves[engine_move_int]))
+                print("\nEngine moved " + Taifho.move_int_to_str(position.legal_moves[engine_move_int])[0] +
+                      Taifho.move_int_to_str(position.legal_moves[engine_move_int])[1] + " goes to " +
+                      Taifho.move_int_to_str(position.legal_moves[engine_move_int])[2] +
+                      Taifho.move_int_to_str(position.legal_moves[engine_move_int])[3], end="")
+                position.make_move(Taifho.move_int_to_str(position.legal_moves[engine_move_int]))
             selected_pawn = ""
             position_to_move = ""
             move_choice = ""
