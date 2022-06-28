@@ -118,9 +118,6 @@ class MCTS:
         """
         for node in reversed(path):
             self.N[node] += 1
-            print(node)
-            print(self.Q)  # TODO(Why is it empty?)
-            print(result)  # TODO(Why is it None?)
             self.Q[node] += result
             result = self._invert_result(result)
 
@@ -150,13 +147,14 @@ class MCTS_with_heuristic_h(MCTS):
         invert_result = True
         for i in range(self.depth):  # this line is changed from super()._simulate()
             if node.is_leaf():
-                result = node.h()  # this line is changed from super()._simulate()
-                if invert_result:
-                    return self._invert_result(result)
-                else:
-                    return result
+                break  # this line is changed from super()._simulate() and code is moved out of the `for` loop
             node = node.find_random_child()
             invert_result = not invert_result
+        result = node.h()  # this line is changed from super()._simulate()
+        if invert_result:
+            return self._invert_result(result)
+        else:
+            return result
 
 class MCTS_with_heuristic_h_G(MCTS_with_heuristic_h):
 
@@ -169,10 +167,11 @@ class MCTS_with_heuristic_h_G(MCTS_with_heuristic_h):
         invert_result = True
         for i in range(self.depth):
             if node.is_leaf():
-                result = node.h_G(self.G)  # this line is changed from super()._simulate()
-                if invert_result:
-                    return self._invert_result(result)
-                else:
-                    return result
+                break  # this line is changed from super()._simulate() and code is moved out of the `for` loop
             node = node.find_random_child()
             invert_result = not invert_result
+        result = node.h_G(self.G)  # this line is changed from super()._simulate()
+        if invert_result:
+            return self._invert_result(result)
+        else:
+            return result
