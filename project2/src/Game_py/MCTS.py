@@ -111,6 +111,9 @@ class MCTS:
         """
         invert_result = True
         while True:
+            if node.moves_made % 500 == 0:  # TODO(Tak to wygląda dla podstawowego MCTSa. Bez sensu jest go wywoływać)
+                node.draw_board()
+                print(f"{node.moves_made} random moves")
             if node.is_leaf():
                 result = node.result()
                 if invert_result:
@@ -139,9 +142,9 @@ class MCTS:
 
 class MCTS_with_heuristic_h(MCTS):
 
-    def __init__(self, C=math.sqrt(2), selection_type="UCT", depth=5):
+    def __init__(self, C=math.sqrt(2), selection_type="UCT", steps=5):
         super().__init__(C, selection_type)
-        self.depth = depth
+        self.steps = steps
 
     def _invert_result(self, result):
         """
@@ -153,7 +156,7 @@ class MCTS_with_heuristic_h(MCTS):
     def _simulate(self, node):
         """Returns the result for a random simulation of `node`"""
         invert_result = True
-        for i in range(self.depth):  # this line is changed from super()._simulate()
+        for i in range(self.steps):  # this line is changed from super()._simulate()
             if node.is_leaf():
                 break  # this line is changed from super()._simulate() and code is moved out of the `for` loop
             node = node.find_random_child()
@@ -166,14 +169,14 @@ class MCTS_with_heuristic_h(MCTS):
 
 class MCTS_with_heuristic_h_G(MCTS_with_heuristic_h):
 
-    def __init__(self, C=math.sqrt(2), selection_type="UCT", depth=5, G=2):
-        super().__init__(C, selection_type, depth)
+    def __init__(self, C=math.sqrt(2), selection_type="UCT", steps=5, G=2):
+        super().__init__(C, selection_type, steps)
         self.G = G
 
     def _simulate(self, node):
         """Returns the result for a random simulation of `node`"""
         invert_result = True
-        for i in range(self.depth):
+        for i in range(self.steps):
             if node.is_leaf():
                 break  # this line is changed from super()._simulate() and code is moved out of the `for` loop
             node = node.find_random_child()

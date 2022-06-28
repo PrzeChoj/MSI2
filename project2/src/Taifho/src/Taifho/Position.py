@@ -76,11 +76,11 @@ class Position:
             if draw_coordinates:
                 print(line_num, end="|")
             for point in board[line_num]:
-                print(self.shapes[point], end=" ")
+                print(self.shapes[point], end="  ")
             print("")
 
         if draw_coordinates:
-            print("  A B C D E F G H")
+            print("  A  B  C  D  E  F  G  H")
 
     def select_pawn(self, position_str=None):
         """

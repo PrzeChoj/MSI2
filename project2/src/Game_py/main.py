@@ -32,7 +32,7 @@ while choice != "q":
         C = ""
         max_time = ""
         G = ""
-        depth = ""
+        steps = ""
         print("\n\t\t\t\tStarting the game...\n")
         print("[1] Random engine")
         print("[2] MCTS + UCT engine (as expected: it does not work)")
@@ -65,6 +65,7 @@ while choice != "q":
                     continue
             while max_time == "":
                 try:
+                    # TODO(Przed oddaniem ustawić time na jakieś 10 sekund)
                     max_time_str = input("\nSelect maximum time for each move for engine (in seconds) (press enter for default, 1): ")
                     max_time = 1 if max_time_str == "" else float(max_time_str)
                     if max_time <= 0:
@@ -85,15 +86,15 @@ while choice != "q":
                     G = ""
                     continue
         if engine > 3:
-            while depth == "":
+            while steps == "":
                 try:
-                    depth_str = input("\nSelect maximum depth of simulation for engine (press enter for default, 3): ")
-                    depth = 3 if depth_str == "" else float(depth_str)
-                    if depth <= 0:
-                        raise Exception("depth has to be strictly bigger than 0")
+                    steps_str = input("\nSelect maximum number of steps of simulation for engine (press enter for default, 3): ")
+                    steps = 3 if steps_str == "" else float(steps_str)
+                    if steps <= 0:
+                        raise Exception("steps has to be strictly bigger than 0")
                 except:
-                    print("\nWrong value selected. depth has to be positive integer.")
-                    depth = ""
+                    print("\nWrong value selected. steps has to be positive integer.")
+                    steps = ""
                     continue
         print("[1 or enter] Green (starting player)")
         print("[2] Blue")
@@ -172,13 +173,13 @@ while choice != "q":
                     elif engine == 3:
                         engine_mcts = MCTS(C=C, selection_type="PUCT")
                     elif engine == 4:
-                        engine_mcts = MCTS_with_heuristic_h(C=C, selection_type="UCT", depth=depth)
+                        engine_mcts = MCTS_with_heuristic_h(C=C, selection_type="UCT", steps=steps)
                     elif engine == 5:
-                        engine_mcts = MCTS_with_heuristic_h_G(C=C, selection_type="UCT", depth=depth, G=G)
+                        engine_mcts = MCTS_with_heuristic_h_G(C=C, selection_type="UCT", steps=steps, G=G)
                     elif engine == 6:
-                        engine_mcts = MCTS_with_heuristic_h(C=C, selection_type="PUCT", depth=depth)
+                        engine_mcts = MCTS_with_heuristic_h(C=C, selection_type="PUCT", steps=steps)
                     elif engine == 7:
-                        engine_mcts = MCTS_with_heuristic_h_G(C=C, selection_type="PUCT", depth=depth, G=G)
+                        engine_mcts = MCTS_with_heuristic_h_G(C=C, selection_type="PUCT", steps=steps, G=G)
                     num_of_rollouts = 0
                     start_time = time.time()
                     while True:
