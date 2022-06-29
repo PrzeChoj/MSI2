@@ -36,37 +36,42 @@ class Node(Position):
 
     def h(self):
         """Wynik gry liczony za pomocą heurystyki h, niekoniecznie na podstawie zakończonej planszy"""
-        sum_player = 0
-        sum_enemy = 0
+        sum_player1 = 0
+        sum_player2 = 0
+        for fig in [1, 2, 3, 4]:
+            pawns = np.where(self.board == fig)
+            for i in range(0, len(pawns)):
+                sum_player1 += 9 - pawns[0][i]  # It is right order of 0 and i. The numpy works this way.
+        for fig in [5, 6, 7, 8]:
+            pawns = np.where(self.board == fig)
+            for i in range(0, len(pawns)):
+                sum_player2 += pawns[0][i]  # It is right order of 0 and i. The numpy works this way.
+
         if self.legal_figures == [1, 2, 3, 4]:
-            for fig in self.legal_figures:
-                pawns = np.where(self.board == fig)
-                for i in range(0, len(pawns)):
-                    sum_player += 9 - pawns[0][i]  # It is right order of 0 and i. The numpy works this way.
+            return sum_player1 - sum_player2
         else:
-            for fig in [5, 6, 7, 8]:
-                pawns = np.where(self.board == fig)
-                for i in range(0, len(pawns)):
-                    sum_enemy += pawns[0][i]
-        return sum_player - sum_enemy
+            return sum_player2 - sum_player1
+
 
     def h_G(self, G=2):
         """Wynik gry liczony za pomocą heurystyki h_G, niekoniecznie na podstawie zakończonej planszy"""
         if G <= 1:
             raise Exception("Wrong G parameter is selected. Should be G > 1")
-        sum_player = 0
-        sum_enemy = 0
+        sum_player1 = 0
+        sum_player2 = 0
+        for fig in [1, 2, 3, 4]:
+            pawns = np.where(self.board == fig)
+            for i in range(0, len(pawns)):
+                sum_player1 += (9 - pawns[0][i]) * math.log(9 + G) / math.log((9 - pawns[0][i]) + G)
+        for fig in [5, 6, 7, 8]:
+            pawns = np.where(self.board == fig)
+            for i in range(0, len(pawns)):
+                sum_player2 += pawns[0][i] * math.log(9 + G) / math.log(pawns[0][i] + G)
+
         if self.legal_figures == [1, 2, 3, 4]:
-            for fig in self.legal_figures:
-                pawns = np.where(self.board == fig)
-                for i in range(0, len(pawns)):
-                    sum_player += (9 - pawns[0][i]) * math.log(9 + G) / math.log((9 - pawns[0][i]) + G)
+            return sum_player1 - sum_player2
         else:
-            for fig in [5, 6, 7, 8]:
-                pawns = np.where(self.board == fig)
-                for i in range(0, len(pawns)):
-                    sum_enemy += pawns[0][i] * math.log(9 + G) / math.log(pawns[0][i] + G)
-        return sum_player - sum_enemy
+            return sum_player2 - sum_player1
 
     def find_random_child(self):
         """Znajduje losowe dziecko dla węzła, czyli losową nowa dostępną pozycję z aktualnej planszy"""
