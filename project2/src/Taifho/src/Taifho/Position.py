@@ -275,13 +275,13 @@ class Position:
             return False
         if np.all(np.logical_and(self.board[0] != 0, self.board[0] != 9)):
             if print_who_won:
-                print("\nGreen won!")
+                print(f"\nGreen won after {self.moves_made} moves!")
             self.is_terminal = True
             self.winner = True
             return True
         if np.all(np.logical_and(self.board[9] != 0, self.board[9] != 9)):
             if print_who_won:
-                print("\nBlue won!")
+                print(f"\nBlue won after {self.moves_made} moves!")
             self.is_terminal = True
             self.winner = False
             return True
