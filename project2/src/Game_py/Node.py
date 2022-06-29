@@ -8,7 +8,9 @@ from Taifho import *
 
 class Node(Position):
     def find_children(self):
-        """Zwraca wszystkie dzieci węzła, czyli wszystkie dostępne pozycje z aktualnej planszy"""
+        """
+        Zwraca wszystkie dzieci węzła, czyli wszystkie dostępne pozycje z aktualnej planszy
+        """
         if self.is_terminal:
             return set()
         children = set()
@@ -19,11 +21,15 @@ class Node(Position):
         return children
 
     def is_leaf(self):
-        """Zwraca True jeśli dziecko jest węzeł nie ma dzieci, czyli gdy nie można wykonać już więcej ruchów z danej pozycji planszy"""
+        """
+        Zwraca True jeśli dziecko jest węzeł nie ma dzieci, czyli gdy nie można wykonać już więcej ruchów z danej pozycji planszy
+        """
         return self.is_terminal
 
     def result(self):
-        """Zwraca wynik gry. 0-przegrana, 1-wygrana"""
+        """
+        Zwraca wynik gry. 0-przegrana, 1-wygrana
+        """
         if not self.is_terminal:
             raise RuntimeError(f"Result called on nonterminal board!")
         if self.move_green == (not self.winner):
@@ -35,7 +41,9 @@ class Node(Position):
         raise RuntimeError(f"board has unknown winner type {self.winner}")
 
     def h(self):
-        """Wynik gry liczony za pomocą heurystyki h, niekoniecznie na podstawie zakończonej planszy"""
+        """
+        Wynik gry liczony za pomocą heurystyki h, niekoniecznie na podstawie zakończonej planszy
+        """
         sum_player1 = 0
         sum_player2 = 0
         for fig in [1, 2, 3, 4]:
@@ -47,14 +55,15 @@ class Node(Position):
             for i in range(0, len(pawns)):
                 sum_player2 += pawns[0][i]  # It is right order of 0 and i. The numpy works this way.
 
-        if self.legal_figures == [1, 2, 3, 4]:
+        if self.move_green:
             return sum_player1 - sum_player2
         else:
             return sum_player2 - sum_player1
 
-
     def h_G(self, G=2):
-        """Wynik gry liczony za pomocą heurystyki h_G, niekoniecznie na podstawie zakończonej planszy"""
+        """
+        Wynik gry liczony za pomocą heurystyki h_G, niekoniecznie na podstawie zakończonej planszy
+        """
         if G <= 1:
             raise Exception("Wrong G parameter is selected. Should be G > 1")
         sum_player1 = 0
@@ -74,19 +83,25 @@ class Node(Position):
             return sum_player2 - sum_player1
 
     def find_random_child(self):
-        """Znajduje losowe dziecko dla węzła, czyli losową nowa dostępną pozycję z aktualnej planszy"""
+        """
+        Znajduje losowe dziecko dla węzła, czyli losową nowa dostępną pozycję z aktualnej planszy
+        """
         if self.is_terminal:
             return None
         self.make_move(move_int_to_str(self.get_legal_moves()[randint(0, len(self.get_legal_moves()) - 1)]))
         return self
 
     def calculate_weight(self):
-        """Oblicza wagi M do algorytmu PUCT dla każdego dziecka i zwraca w postaci słownika {dziecko = waga}"""
+        """
+        Oblicza wagi M do algorytmu PUCT dla każdego dziecka i zwraca w postaci słownika {dziecko = waga}
+        """
         M = dict()
         K = len(self.get_legal_moves())
 
         def distance_from_start():
-            """Oblicza różnicę odlegości bierki od początku planszy względem aktualnego stanu a wykonanego ruchu. Zwraca wynik dla wszystkich bierek"""
+            """
+            Oblicza różnicę odlegości bierki od początku planszy względem aktualnego stanu a wykonanego ruchu. Zwraca wynik dla wszystkich bierek
+            """
             distance = dict()
             for a in self.get_legal_moves():
                 if self.move_green:

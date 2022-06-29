@@ -14,7 +14,9 @@ class MCTS:
         self.selection_type = selection_type
 
     def choose_move(self, node) -> Node:
-        """Choose the best successor of node -> choose a move in the game"""
+        """
+        Choose the best successor of node -> choose a move in the game
+        """
         if node.is_leaf():
             raise RuntimeError(f"choose called on leaf node. No more moves available!")
 
@@ -29,7 +31,9 @@ class MCTS:
         return max(self.children[node], key=score)
 
     def do_rollout(self, node) -> None:
-        """Make the tree one layer better. (Train for one iteration.)"""
+        """
+        Make the tree one layer better. (Train for one iteration.)
+        """
         path = self._select(node)
         leaf = path[-1]  # This is named leaf, because it will be the leaf in the tree of visited nodes, but not necessarily the leaf in the tree of the game
         self._expand(leaf)
@@ -38,7 +42,9 @@ class MCTS:
         self._backpropagate(path, result)
 
     def _select(self, node) -> list:
-        """Find an unexplored descendent of `node`"""
+        """
+        Find an unexplored descendent of `node`
+        """
         path = []
         while True:
             path.append(node)
@@ -97,7 +103,9 @@ class MCTS:
         return max(self.children[node], key=puct)
 
     def _expand(self, node) -> None:
-        """Update the `children` dict with the children of `node`"""
+        """
+        Update the `children` dict with the children of `node`
+        """
         if node in self.children:
             return  # already expanded
         self.children[node] = node.find_children()
@@ -154,7 +162,9 @@ class MCTS_with_heuristic_h(MCTS):
         return - result
 
     def _simulate(self, node):
-        """Returns the result for a random simulation of `node`"""
+        """
+        Returns the result for a random simulation of `node`
+        """
         invert_result = True
         for i in range(self.steps):  # this line is changed from super()._simulate()
             if node.is_leaf():
@@ -174,7 +184,9 @@ class MCTS_with_heuristic_h_G(MCTS_with_heuristic_h):
         self.G = G
 
     def _simulate(self, node):
-        """Returns the result for a random simulation of `node`"""
+        """
+        Returns the result for a random simulation of `node`
+        """
         invert_result = True
         for i in range(self.steps):
             if node.is_leaf():
