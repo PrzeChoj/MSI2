@@ -1,5 +1,5 @@
 import numpy as np
-from copy import deepcopy
+import copy
 from itertools import chain
 
 from .utilities import *
@@ -129,7 +129,7 @@ class Position:
         możliwe kierunki direction: 0 - up, 1 - up-right 2 - right, ..., 7 - up-left
         """
         if board is None:
-            board = copy(self.board)
+            board = copy.copy(self.board)
         if next_place(pawn, direction) is None:
             return 0
         for step in range(1, 11):
@@ -148,14 +148,11 @@ class Position:
             already_found_moves jest listą róchów już znalezionych. Jeśli trafił w pole w którym już był,
             to przerywa rekurencję. org_pawn to współrzędne z którego pionek zaczął skoki i
             jest inny niż None w rekurencji. Użyty jest do poprawnego zapisu.
-
-        Jest nieotestowana, bo trzeba najpierw zaimplementować funkcję self.distance_to_closest() oraz
-            funkcję next_place(), co jeszcze się nie stało.
         """
         # i.e. pawn = [9, 4] so it is position_int
 
         if board is None:
-            board = copy(self.board)
+            board = copy.copy(self.board)
         if org_pawn is None:
             org_pawn = pawn
 
@@ -176,7 +173,7 @@ class Position:
         elif pawn_figure in [7]:
             directions_to_look_for_moves = [0, 3, 5]
 
-        legal_moves_for_pawn = copy(already_found_moves)  # for the recursive, there are
+        legal_moves_for_pawn = copy.copy(already_found_moves)  # for the recursive, there are
 
         for direction in directions_to_look_for_moves:
             pawn_distance_to_closest = self.distance_to_closest(pawn, direction, board)
@@ -216,7 +213,7 @@ class Position:
                     legal_moves_for_pawn.append(move)
 
                     # next jumps recursive:
-                    board_after_move = deepcopy(board)
+                    board_after_move = copy.copy(board)
                     board_after_move[pawn[0], pawn[1]], board_after_move[next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]] = board_after_move[next_place_for_pawn_jump[0], next_place_for_pawn_jump[1]], board_after_move[pawn[0], pawn[1]]
 
                     next_jumps_for_pawn = self.calculate_legal_moves_for_pawn(next_place_for_pawn_jump, only_jumps=True,
@@ -241,15 +238,18 @@ class Position:
             return False
         return move_ints in self.get_legal_moves()
 
-    def make_move(self, move_str):
+    def make_move(self, move_str, carefully=True):
         """
         Zamienia bierkię i puste pole na planszy
+
+        Jeśli flaga carefully jest False, to nie sprawdza, czy zawołany ruch jest legalny
         """
         move = move_str_to_int(move_str)
 
-        if not self.is_move_legal(move):
-            print("The selected move is not allowed. Select other move")
-            return
+        if carefully:
+            if not self.is_move_legal(move):
+                print("The selected move is not allowed. Select other move")
+                return
 
         # swap pawn with empty space
         self.board[move[2],
@@ -260,7 +260,7 @@ class Position:
         self.move_green = not self.move_green
         self.legal_figures = [1, 2, 3, 4] if self.move_green else [5, 6, 7, 8]
         self.moves_made += 0.5
-        self.calculate_possible_moves()
+        self.legal_moves = []  # Jak bedzie potrzeba listy ruchów, to sobie policzy, ale na pewno będzie trzeba policzyć jeszcze raz
 
         self.selected_pawn = None
         self.board[self.board == 9] = 0  # usuwa stare zapisy możliwych ruchów

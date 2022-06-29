@@ -1,5 +1,5 @@
 from string import ascii_lowercase as alphabet
-from copy import copy
+import copy
 import re
 import numpy as np
 
@@ -84,7 +84,7 @@ def next_place(place, direction, steps=1):
     """
     if place[0] < 0 or place[0] > 9 or place[1] < 0 or place[1] > 7:
         raise Exception("the given place is out of the board")
-    new_place = copy(place)
+    new_place = copy.copy(place)
     if direction in [0, 1, 7]:
         new_place[0] -= steps
     elif direction in [3, 4, 5]:
