@@ -116,7 +116,7 @@ while choice != "q":
             position.draw_board()
             if position.get_actual_player() == color:
                 while selected_pawn == "":
-                    selected_pawn = input(f"\nSelect pawn to make a move by entering letter and number denoting the position (eg. {Taifho.position_int_to_str([position.legal_moves[0][0], position.legal_moves[0][1]])}): ")
+                    selected_pawn = input(f"\nSelect pawn to make a move by entering letter and number denoting the position (eg. {Taifho.position_int_to_str([position.get_legal_moves()[0][0], position.get_legal_moves()[0][1]])}): ")
                     if not re.match(re.compile("^([a-hA-H][0-9])"), selected_pawn):
                         print("The wrong value has been entered. Select your figure")
                         selected_pawn = ""
@@ -164,7 +164,7 @@ while choice != "q":
                 print("\nEngine thinks: ...")
                 if engine == 1:
                     time.sleep(1)
-                    engine_move_int = randint(0, len(position.legal_moves)-1)
+                    engine_move_int = randint(0, len(position.get_legal_moves())-1)
                 else:
                     node = make_Node_from_Position(position)
                     engine_mcts = None
@@ -195,15 +195,15 @@ while choice != "q":
                     engine_move_node = engine_mcts.choose_move(node)
                     engine_move_move = Taifho.which_move_was_made(node.board, engine_move_node.board)
                     engine_move_int = None
-                    for i in range(len(position.legal_moves)):
-                        if position.legal_moves[i] == engine_move_move:
+                    for i in range(len(position.get_legal_moves())):
+                        if position.get_legal_moves()[i] == engine_move_move:
                             engine_move_int = i
 
-                print("\nEngine moved " + Taifho.move_int_to_str(position.legal_moves[engine_move_int])[0] +
-                      Taifho.move_int_to_str(position.legal_moves[engine_move_int])[1] + " goes to " +
-                      Taifho.move_int_to_str(position.legal_moves[engine_move_int])[2] +
-                      Taifho.move_int_to_str(position.legal_moves[engine_move_int])[3], end="")
-                position.make_move(Taifho.move_int_to_str(position.legal_moves[engine_move_int]))
+                print("\nEngine moved " + Taifho.move_int_to_str(position.get_legal_moves()[engine_move_int])[0] +
+                      Taifho.move_int_to_str(position.get_legal_moves()[engine_move_int])[1] + " goes to " +
+                      Taifho.move_int_to_str(position.get_legal_moves()[engine_move_int])[2] +
+                      Taifho.move_int_to_str(position.get_legal_moves()[engine_move_int])[3], end="")
+                position.make_move(Taifho.move_int_to_str(position.get_legal_moves()[engine_move_int]))
             selected_pawn = ""
             position_to_move = ""
             move_choice = ""

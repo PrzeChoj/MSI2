@@ -87,11 +87,11 @@ def next_place(place, direction, steps=1):
     new_place = copy(place)
     if direction in [0, 1, 7]:
         new_place[0] -= steps
-    if direction in [3, 4, 5]:
+    elif direction in [3, 4, 5]:
         new_place[0] += steps
     if direction in [5, 6, 7]:
         new_place[1] -= steps
-    if direction in [1, 2, 3]:
+    elif direction in [1, 2, 3]:
         new_place[1] += steps
     if new_place[0] < 0 or new_place[0] > 9 or new_place[1] < 0 or new_place[1] > 7:
         return None

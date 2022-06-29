@@ -25,7 +25,6 @@ class Position:
         self.legal_figures = [1, 2, 3, 4]
         self.legal_moves = []
         self.winner = None
-        self.calculate_possible_moves()  # overwrite self.legal_moves
         self.selected_pawn = None
 
     def get_actual_player(self):
@@ -114,6 +113,11 @@ class Position:
                 legal_moves_for_pawn = self.calculate_legal_moves_for_pawn([pawns[0][i], pawns[1][i]])
                 legal_moves.append(legal_moves_for_pawn)
         self.legal_moves = list(chain.from_iterable(legal_moves))
+
+    def get_legal_moves(self):
+        if len(self.legal_moves) == 0:
+            self.calculate_possible_moves()
+        return self.legal_moves
 
     def distance_to_closest(self, pawn, direction, board=None):
         """
@@ -235,7 +239,7 @@ class Position:
         if self.board[move_ints[2], move_ints[3]] not in [0, 9]:
             print("Destination field is occupied. Select other field")
             return False
-        return move_ints in self.legal_moves
+        return move_ints in self.get_legal_moves()
 
     def make_move(self, move_str):
         """

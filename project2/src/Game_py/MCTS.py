@@ -144,7 +144,7 @@ class MCTS_with_heuristic_h(MCTS):
 
     def __init__(self, C=math.sqrt(2), selection_type="UCT", steps=5):
         super().__init__(C, selection_type)
-        self.steps = steps
+        self.steps = int(steps)
 
     def _invert_result(self, result):
         """

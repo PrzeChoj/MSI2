@@ -12,9 +12,9 @@ class Node(Position):
         if self.is_terminal:
             return set()
         children = set()
-        for i in range(0, len(self.legal_moves)):
+        for i in range(0, len(self.get_legal_moves())):
             position = make_Node_from_Position(self)
-            position.make_move(move_int_to_str(self.legal_moves[i]))
+            position.make_move(move_int_to_str(self.get_legal_moves()[i]))
             children.add(position)
         return children
 
@@ -77,18 +77,18 @@ class Node(Position):
         """Znajduje losowe dziecko dla węzła, czyli losową nowa dostępną pozycję z aktualnej planszy"""
         if self.is_terminal:
             return None
-        self.make_move(move_int_to_str(self.legal_moves[randint(0, len(self.legal_moves) - 1)]))
+        self.make_move(move_int_to_str(self.get_legal_moves()[randint(0, len(self.get_legal_moves()) - 1)]))
         return self
 
     def calculate_weight(self):
         """Oblicza wagi M do algorytmu PUCT dla każdego dziecka i zwraca w postaci słownika {dziecko = waga}"""
         M = dict()
-        K = len(self.legal_moves)
+        K = len(self.get_legal_moves())
 
         def distance_from_start():
             """Oblicza różnicę odlegości bierki od początku planszy względem aktualnego stanu a wykonanego ruchu. Zwraca wynik dla wszystkich bierek"""
             distance = dict()
-            for a in self.legal_moves:
+            for a in self.get_legal_moves():
                 if self.move_green:
                     distance[move_int_to_str(a)] = - (a[2] - a[0])
                 else:
@@ -96,15 +96,15 @@ class Node(Position):
             max_d = max(distance.values())
             min_d = min(distance.values())
             if max_d - min_d > 1:
-                for a in self.legal_moves:
+                for a in self.get_legal_moves():
                     distance[move_int_to_str(a)] = (distance[move_int_to_str(a)] - min_d) / (max_d - min_d) * (1-1/K - 1/K**3) + 1/K**3  # Scale distance into [1/K**3, 1-1/K]
             else:  # every heuristic for a move is the same
-                for a in self.legal_moves:
+                for a in self.get_legal_moves():
                     distance[move_int_to_str(a)] = 1/K**3  # Set every one to equal number 1/K**3
             return distance
         D = distance_from_start()
-        for a in self.legal_moves:
-            weight = math.exp(1 / K * D[move_int_to_str(a)]) / sum([math.exp(1 / K * D[move_int_to_str(i)]) for i in self.legal_moves])
+        for a in self.get_legal_moves():
+            weight = math.exp(1 / K * D[move_int_to_str(a)]) / sum([math.exp(1 / K * D[move_int_to_str(i)]) for i in self.get_legal_moves()])
             M[move_int_to_str(a)] = weight
         return M
 
@@ -117,7 +117,7 @@ def make_Node_from_Position(position):
     node.move_green = position.move_green
     node.is_terminal = position.is_terminal
     node.legal_figures = copy.copy(position.legal_figures)
-    node.legal_moves = copy.copy(position.legal_moves)
+    node.legal_moves = copy.copy(position.legal_moves)  # The only situation when one gets to legal_moves directly; every other moment use get_legal_moves()
     node.winner = position.winner
     node.selected_pawn = copy.copy(position.selected_pawn)
 
