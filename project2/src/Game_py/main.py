@@ -65,7 +65,7 @@ while choice != "q":
                     continue
             while max_time == "":
                 try:
-                    # TODO(Przed oddaniem ustawić time na jakieś 10 sekund)
+                    # TODO(Przed oddaniem ustawić default na jakieś 10 sekund)
                     max_time_str = input("\nSelect maximum time for each move for engine (in seconds) (press enter for default, 1): ")
                     max_time = 1 if max_time_str == "" else float(max_time_str)
                     if max_time <= 0:
