@@ -1,10 +1,10 @@
 import Taifho
-import copy
+import math
 import numpy as np
 import time
 
-from MCTS import MCTS, MCTS_with_heuristic_h, MCTS_with_heuristic_h_G
-from Node import Node, make_Node_from_Position
+from MCTS import MCTS_with_heuristic_h
+from Node import Node
 
 position = Node()
 
@@ -23,7 +23,7 @@ position.moves_made = 20
 
 position.draw_board()
 
-engine_mcts = MCTS_with_heuristic_h(selection_type="UCT", steps=2)
+engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="UCT", steps=2)
 
 max_time = 60  # TODO(Edit here)
 num_of_rollouts = 0

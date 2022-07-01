@@ -65,9 +65,8 @@ while choice != "q":
                     continue
             while max_time == "":
                 try:
-                    # TODO(Przed oddaniem ustawić default na jakieś 10 sekund)
-                    max_time_str = input("\nSelect maximum time for each move for engine (in seconds) (press enter for default, 1): ")
-                    max_time = 1 if max_time_str == "" else float(max_time_str)
+                    max_time_str = input("\nSelect maximum time for each move for engine (in seconds) (press enter for default, 10): ")
+                    max_time = 10 if max_time_str == "" else float(max_time_str)
                     if max_time <= 0:
                         raise Exception("max_time has to be strictly bigger than 0")
                 except:
@@ -77,8 +76,8 @@ while choice != "q":
         if engine in [5, 7]:
             while G == "":
                 try:
-                    G_str = input("\nSelect G value for UCT (press enter for default, 2): ")
-                    G = 2 if G_str == "" else float(G_str)
+                    G_str = input("\nSelect G value for UCT (press enter for default, 20): ")
+                    G = 20 if G_str == "" else float(G_str)
                     if G <= 1:
                         raise Exception("G has to be strictly bigger than 1")
                 except:
@@ -88,8 +87,8 @@ while choice != "q":
         if engine > 3:
             while steps == "":
                 try:
-                    steps_str = input("\nSelect maximum number of steps of simulation for engine (press enter for default, 3): ")
-                    steps = 3 if steps_str == "" else float(steps_str)
+                    steps_str = input("\nSelect maximum number of steps of simulation for engine (press enter for default, 6): ")
+                    steps = 6 if steps_str == "" else float(steps_str)
                     if steps <= 0:
                         raise Exception("steps has to be strictly bigger than 0")
                 except:
