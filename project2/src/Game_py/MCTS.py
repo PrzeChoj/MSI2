@@ -85,19 +85,21 @@ class MCTS:
         if len(node.find_children()) <= 1:
             return node.find_children()
 
+        N_vertex = self.N[node]
         log_N_vertex = math.log(self.N[node])
+        sqrt_N_vertex = math.sqrt(log_N_vertex / self.N[node])
         M = node.calculate_weight()
 
         def puct(a):
             """
             Predictor + Upper confidence bound for trees
             """
-            def m(N, a):
-                if N > 1:
-                    return 2 / M[move_int_to_str(which_move_was_made(node.board, a.board))] * math.sqrt(math.log(N) / N)
+            def m(a):
+                if N_vertex > 1:
+                    return 2 / M[move_int_to_str(which_move_was_made(node.board, a.board))] * sqrt_N_vertex
                 else:
                     return 2 / M[move_int_to_str(which_move_was_made(node.board, a.board))]
-            out = self.Q[a] / self.N[a] + self.C * math.sqrt(log_N_vertex / self.N[a]) - m(self.N[a], a)
+            out = self.Q[a] / self.N[a] + self.C * math.sqrt(log_N_vertex / self.N[a]) - m(a)
             return out
 
         return max(self.children[node], key=puct)

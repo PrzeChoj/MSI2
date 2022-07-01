@@ -3,7 +3,6 @@ import time
 from random import randint, seed
 from statistics import mean
 
-import numpy as np
 import math
 
 from MCTS import MCTS_with_heuristic_h, MCTS_with_heuristic_h_G

@@ -100,7 +100,8 @@ class Node(Position):
 
         def distance_from_start():
             """
-            Oblicza różnicę odlegości bierki od początku planszy względem aktualnego stanu a wykonanego ruchu. Zwraca wynik dla wszystkich bierek
+            Oblicza różnicę odlegości bierki od początku planszy względem aktualnego stanu a wykonanego ruchu.
+            Zwraca wynik dla wszystkich bierek.
             """
             distance = dict()
             for a in self.get_legal_moves():
@@ -117,7 +118,7 @@ class Node(Position):
                 for a in self.get_legal_moves():
                     distance[move_int_to_str(a)] = 1/K**3  # Set every one to equal number 1/K**3
             return distance
-        D = distance_from_start()
+        D = distance_from_start()  # vector is already scaled!
         for a in self.get_legal_moves():
             weight = math.exp(1 / K * D[move_int_to_str(a)]) / sum([math.exp(1 / K * D[move_int_to_str(i)]) for i in self.get_legal_moves()])
             M[move_int_to_str(a)] = weight
@@ -125,6 +126,9 @@ class Node(Position):
 
 
 def make_Node_from_Position(position):
+    """
+    Tworzy nowy obiekt klasy Node na podstawie obiektu klasy Position
+    """
     node = Node()
 
     node.board = copy.copy(position.board)
