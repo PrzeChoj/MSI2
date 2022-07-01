@@ -1,25 +1,26 @@
 import Taifho
 import time
-import math
 from random import randint
 from statistics import mean
 
-from MCTS import MCTS_with_heuristic_h, MCTS_with_heuristic_h_G
+from MCTS import MCTS_with_heuristic_h_G
 from Node import Node
 
-# TODO(Dodać zapisywanie do pliku)
+# saving to file
+with open('results/C_h_G_experiment.csv', 'a') as f:
+    f.write(f'game_id;C_value;G_value;who_won;moves_made;time\n')
 
-C = math.sqrt(2)  # TODO(Ustawić C zgodnie z wyborem z testu 3)
+C = 3.5
 max_time = 2
 steps = 6
-G_parameters = [2, 3, 4, 5, 6, 8, 10, 15, 20]
+G_parameters = [1.1, 2, 3.5, 5, 7, 10, 20]
 
-# Game for UCT + h heuristics
+# Game for UCT + h_G heuristics
 
 for G in G_parameters:  # for each G parameters
     time_of_games = []
     for j in range(0, 10):  # 10 repeats experiment
-        print(f"\nExperiment number {j+1} for a value of G equal to {G}")
+        print(f"\nExperiment number {j} for a value of G equal to {G}")
         start_game = time.time()
         position = Node()
         while not position.check_is_terminal(print_who_won=False):
@@ -46,10 +47,15 @@ for G in G_parameters:  # for each G parameters
                         engine_move_int = i
                 position.make_move(Taifho.move_int_to_str(position.get_legal_moves()[engine_move_int]))
         end_game = time.time()
-        print(f"{'Random engine' if position.winner else 'MCTS engine'} ({'Green' if position.winner else 'Blue'}) won after {int(position.moves_made)} moves!")
+        print(f"{'Random engine' if position.winner else 'MCTS engine'} ({'Green' if position.winner else 'Blue'}) won after {position.moves_made} moves!")
         game_time = end_game - start_game
         time_of_games.append(game_time)
         print(f"Game lasted {game_time} seconds")
+
+        # saving to file
+        with open('results/C_h_G_experiment.csv', 'a') as f:
+            f.write(f'{j};{C};{G};{"Random" if position.winner else "MCTS"};{position.moves_made};{game_time}\n')
+
         print("\n***********************************************")
     mean_time = mean(time_of_games)
     print(f"\nMean time of game: {mean_time}\n")
