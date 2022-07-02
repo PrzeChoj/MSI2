@@ -14,9 +14,8 @@ with open('results/C_h_experiment.csv', 'a') as f:
 C_parameters = [1, math.sqrt(2), 2, 3.5, 5]
 max_time = 1.5
 steps = 6
-G = 2
 
-# Game for UCT + h heuristics
+# Game for UCT + h heuristics with random enemy
 
 for C in C_parameters:  # for each C parameters
     time_of_games = []

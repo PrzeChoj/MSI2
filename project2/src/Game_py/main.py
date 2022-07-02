@@ -95,7 +95,7 @@ while choice != "q":
                     print("\nWrong value selected. steps has to be positive integer.")
                     steps = ""
                     continue
-        print("[1 or enter] Green (starting player)")
+        print("\n[1 or enter] Green (starting player)")
         print("[2] Blue")
         while color == "":
             try:
