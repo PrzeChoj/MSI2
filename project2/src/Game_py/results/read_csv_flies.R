@@ -12,8 +12,8 @@ C_h %>% group_by(C_value) %>% summarise(a = mean(moves_made, na.rm = TRUE))
 
 C_h %>% 
   ggplot(aes(x=C_value, y=moves_made, color=factor(C_value),
-             fill=factor(C_value), alpha=0.3)) +
-  geom_violin(na.rm = TRUE, bw=10) +
+             fill=factor(C_value), alpha=0.8)) +
+  geom_dotplot(binaxis = "y", binwidth=25, stackdir="center") +
   labs(title = "Liczba ruchów w zależności od parametru C",
        subtitle = "którą potrzebował algorytm MCTS do pokonania losowo poruszającego się przeciwnika",
        x = "Wartosć parametru C",
@@ -38,8 +38,8 @@ C_h_G %>% group_by(G_value) %>%
 
 C_h_G %>% 
   ggplot(aes(x=G_value, y=moves_made, color=factor(G_value),
-             fill=factor(G_value), alpha=0.3)) +
-  geom_violin(na.rm = TRUE, bw=5) +
+             fill=factor(G_value), alpha=0.8)) +
+  geom_dotplot(binaxis = "y", binwidth=10, stackdir="center") +
   labs(title = "Liczba ruchów w zależności od parametru G",
        subtitle = "którą potrzebował algorytm MCTS do pokonania losowo poruszającego się przeciwnika",
        x = "Wartosć parametru G",
