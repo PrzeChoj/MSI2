@@ -121,7 +121,7 @@ class MCTS:
         """
         invert_result = True
         while True:
-            if node.moves_made % 500 == 0:  # TODO(Tak to wygląda dla podstawowego MCTSa. Bez sensu jest go wywoływać)
+            if node.moves_made % 500 == 0:  # Tak to wygląda dla podstawowego MCTSa. Bez sensu jest go wywoływać
                 node.draw_board()
                 print(f"{node.moves_made} random moves")
             if node.is_leaf():

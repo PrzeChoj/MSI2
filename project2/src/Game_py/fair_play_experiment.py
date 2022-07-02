@@ -25,7 +25,7 @@ position.draw_board()
 
 engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="UCT", steps=6)
 
-max_time = 60  # TODO(Edit here)
+max_time = 60
 num_of_rollouts = 0
 start_time = time.time()
 while True:
