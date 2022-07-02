@@ -35,10 +35,10 @@ Wszystkie pliki odnoście do tego trojektu znajdują się w folderze `project2`.
 3. W Terminalu wpisz komendę: `pip install .`
 4. Przejdź w Terminalu do folderu `project2/src/Game_py`
 5. W Terminalu wpisz komendę: `python main.py`
-6. Wybierz opcję `[1] Start Game!` przyciskiem `1`
+6. Wybierz opcję `[1] Start Game!` przyciskiem `1` i zatwierdzając go przyciskiem 'Enter'
 7. Wybierz algorytm MCTS oznaczony cyframi od 4 do 7. Cyfrą 1 oznaczono algorytm błądzenia losowego, a cyframi 2 i 3 podstawowe wersje algorytmu MCTS, o których pokazano w raporcie, że nie mogą działać satysfakcjonująco w grze Taifho.
 8. Można dostosować pozostałe parametry algorytmu MCTS takie jak `C`, `G`, `steps` oraz czas "do namysłu" dla algorytmu MCTS, ale można zostawić je na wartości bazowe, wybierając kilkakrotnie przycisk `Enter`
-9. Wybierz którym kolorem chcesz grać. Zielony zaczyna (jak biały w szachach)
+9. Wybierz, którym kolorem chcesz grać. Zielony zaczyna (jak biały w szachach)
 
 Pozycja startowa:
 
@@ -46,7 +46,7 @@ Pozycja startowa:
 
 10. W każdym ruchu wybierz, którą bierką chcesz się ruszyć (można zmienić swój wybór) np. `D9` (można używać zarówno dużych, jak i małych liter do oznaczenia pozycji)
 11. Na planszy znakiem `*` pokazane zostały pola, na które wybrana bierka może się ruszyć
-12. Zaakceptuj wybór bierki przyciskiem `Enter` bądź zmień bierkę przyciskiem `1`
+12. Zaakceptuj wybór bierki przyciskiem `Enter` bądź zmień bierkę przyciskiem `1` zatwierdzając wybór 'Enter'
 13. Po wybraniu i zaakceptowaniu bierki wybierz pozycję, na którą chcesz ruszyć się bierką (jedna z tych oznaczonych gwiazdką)
 14. Poczekaj, aż przeciwnik wykona swój ruch. Trwa to tyle, ile czasu zostało mu dane przed grą (domyślnie 10 sekund)
 15. Znów wykonaj zwój ruch tak, jak od punktu 10
