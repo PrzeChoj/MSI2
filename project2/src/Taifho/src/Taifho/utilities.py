@@ -7,7 +7,7 @@ import numpy as np
 # sposób int to tablica intów dłógości 4 dla move i 2 dla position.
 # najbliższe 4 funkcje to tłumaczenia z str na int i odwrotnie
 # Pierwszy int reprezentuje wiersz, drugi kolumnę, czyli drugi tłumaczy się na literę.
-# ALE litery pisze się jako pierwsze
+# ALE litery pisze się jako pierwsze w wersji str
 
 
 def move_str_to_int(move_str):
@@ -69,9 +69,9 @@ def position_int_to_str(position_int):
 
 def next_place(place, direction, steps=1):
     """
-    Returns the next place from the given one
+    Zwraca następne miejsce w danym kierunku dla bierki z podanej pozycji
 
-    Exp:
+    Przykłady:
     next_place([4, 4], 0) == [3 ,4]
     next_place([4, 4], 3) == [5 ,5]
     next_place([0, 0], 1) == None  # the board has ended
@@ -100,8 +100,8 @@ def next_place(place, direction, steps=1):
 
 def which_move_was_made(board_from, board_to):
     """
-    Gets 2 boards that a half-move from each other (one player has moved)
-    Returns a move that was made in int_form
+    Otrzymuje 2 plansze z rozgrywki, które przesunęły się o połowę tury od siebie (tzn. jeden gracz się poruszył)
+    Zwraca ruch, który został wykonany w formie int
     """
     if np.sum(board_from != board_to) != 2:
         raise Exception("Wrong boards passed into `which_move_was_made()` function.")

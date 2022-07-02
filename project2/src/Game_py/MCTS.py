@@ -15,7 +15,7 @@ class MCTS:
 
     def choose_move(self, node) -> Node:
         """
-        Choose the best successor of node -> choose a move in the game
+        Wybiera najlepszego następcę węzła -> wybiera następny ruch w grze
         """
         if node.is_leaf():
             raise RuntimeError(f"choose called on leaf node. No more moves available!")
@@ -32,7 +32,7 @@ class MCTS:
 
     def do_rollout(self, node) -> None:
         """
-        Make the tree one layer better. (Train for one iteration.)
+        Dodanie do drzewa jednej warstwy (Trenowanie przez jedną iterację)
         """
         path = self._select(node)
         leaf = path[-1]  # This is named leaf, because it will be the leaf in the tree of visited nodes, but not necessarily the leaf in the tree of the game
@@ -43,7 +43,7 @@ class MCTS:
 
     def _select(self, node) -> list:
         """
-        Find an unexplored descendent of `node`
+        Znajduje niezbadanego potomka `węzła`
         """
         path = []
         while True:
@@ -64,14 +64,14 @@ class MCTS:
 
     def _uct_selection(self, node) -> Node:
         """
-        Select a child of node using UCT selection method with no modification
+        Wybiera potomka węzła za pomocą metody selekcji UCT bez modyfikacji
         """
         assert all(n in self.children for n in self.children[node])  # all children of node should already be expanded
         log_N_vertex = math.log(self.N[node])
 
         def uct(a):
             """
-            Upper confidence bound for trees
+            Upper confidence bound for trees (UTC)
             """
             return self.Q[a] / self.N[a] + self.C * math.sqrt(log_N_vertex / self.N[a])
 
@@ -79,7 +79,7 @@ class MCTS:
 
     def _puct_selection(self, node) -> Node:
         """
-        Select a child of node using UCT selection method
+        Wybiera potomka węzła za pomocą metody selekcji PUCT
         """
         assert all(n in self.children for n in self.children[node])  # all children of node should already be expanded
         if len(node.find_children()) <= 1:
@@ -92,7 +92,7 @@ class MCTS:
 
         def puct(a):
             """
-            Predictor + Upper confidence bound for trees
+            Predictor + Upper confidence bound for trees = PUTC
             """
             def m(a):
                 if N_vertex > 1:
@@ -106,7 +106,7 @@ class MCTS:
 
     def _expand(self, node) -> None:
         """
-        Update the `children` dict with the children of `node`
+        Aktualizuje słownik `children` o dzieci `węzła`
         """
         if node in self.children:
             return  # already expanded
@@ -114,10 +114,10 @@ class MCTS:
 
     def _simulate(self, node):
         """
-        Returns the result for a random simulation from `node`
+        Zwraca wynik losowej symulacji z `węzła`
 
-        As expected, it takes over 10 000 iterations to find a leaf with random moves in Taifho game.
-        It is not practical method.
+        Zgodnie z oczekiwaniami, znalezienie liścia z losowymi ruchami w grze Taifho zajmuje ponad 10 000 iteracji.
+        To nie jest praktyczna metoda.
         """
         invert_result = True
         while True:
@@ -135,7 +135,7 @@ class MCTS:
 
     def _backpropagate(self, path, result) -> None:
         """
-        Send the result back up to the root
+        Wysyła wynik z powrotem do korzenia drzewa
         """
         for node in reversed(path):
             self.N[node] += 1
@@ -144,8 +144,8 @@ class MCTS:
 
     def _invert_result(self, result):
         """
-        The result of the game is 0 or 1.
-        From the opponent perspective, the result is 1 - result
+        Wynik gry to 0 lub 1.
+        Z perspektywy przeciwnika wynik to 1 - wynik
         """
         return 1 - result
 
@@ -158,14 +158,14 @@ class MCTS_with_heuristic_h(MCTS):
 
     def _invert_result(self, result):
         """
-        The result of the game is real number from the heuristic.
-        From the opponent perspective, the result is - result
+        Wynikiem gry jest liczba rzeczywista z heurystyki.
+        Z perspektywy przeciwnika wynik jest - wynik
         """
         return - result
 
     def _simulate(self, node):
         """
-        Returns the result for a random simulation of `node`
+        Zwraca wynik losowej symulacji z `węzła`
         """
         invert_result = True
         for i in range(self.steps):  # this line is changed from super()._simulate()
@@ -187,7 +187,7 @@ class MCTS_with_heuristic_h_G(MCTS_with_heuristic_h):
 
     def _simulate(self, node):
         """
-        Returns the result for a random simulation of `node`
+        Zwraca wynik losowej symulacji z `węzła`
         """
         invert_result = True
         for i in range(self.steps):

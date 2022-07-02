@@ -15,7 +15,7 @@ max_time = 2
 steps = 6
 G_parameters = [1.1, 2, 3.5, 5, 7, 10, 20]
 
-# Game for UCT + h_G heuristics
+# Game for UCT + h_G heuristics with random enemy
 
 for G in G_parameters:  # for each G parameters
     time_of_games = []

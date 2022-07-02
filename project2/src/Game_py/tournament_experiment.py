@@ -24,9 +24,11 @@ for j in range(0, 10):  # 10 repeats experiment
     while not position.check_is_terminal(print_who_won=False):
         position.calculate_possible_moves()
         if position.get_actual_player() == first_player:
-            engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="UCT", steps=6)
+            engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="UCT", steps=6)  # tournament 1 and 3
+            # engine_mcts = MCTS_with_heuristic_h_G(C=3.5, selection_type="PUCT", steps=6, G=20)  # tournament 1 - loser
         else:
-            engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="PUCT", steps=6)
+            #engine_mcts = MCTS_with_heuristic_h_G(C=3.5, selection_type="UCT", steps=6, G=20)  # tournament 2 - loser
+            engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="PUCT", steps=6)  # tournament 2 and 3
         num_of_rollouts = 0
         start_time = time.time()
         while True:
