@@ -83,13 +83,13 @@ class Position:
 
     def select_pawn(self, position_str=None):
         """
-        zaznacza wybraną bierkę. Przy rysowaniu self.draw_board będą oznaczone jej możliwe ruchy
+        Zaznacza wybraną bierkę. Przy rysowaniu self.draw_board będą oznaczone jej możliwe ruchy
         """
         self.board[self.board == 9] = 0
 
         if position_str is None:
             self.selected_pawn = None
-            return None  # TODO(Make sure I can return None here)
+            return None
 
         position_int = position_str_to_int(position_str)
 
