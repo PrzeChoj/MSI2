@@ -9,5 +9,7 @@
 9. Skoki wielokrotne: Jeśli pionek po wykonaniu skoku znów jest w sytuacji w której mógłby wykonać róch, gdyby był jego ruch, to może. Czyli można skakać wielokrotnie jako jeden ruch.
 10. UWAGA: Nie można uniemożliwić przeciwnikowi zwycięstwa: Jeśli gracz nie chce ruszyć swoim pionkiem z początku planszy, to przegrywa. Dokładnie: Jeśli wszystkie pola startowe gracza C są zajęte, ale jest teraz ruch inny niż 1, to C przegrywa. Nie ważne, jakiego koloru są pionki.
 
-Zasada, której nie będę rozważał (na początku):
+Zasada, której nie rozważaliśmy:
 11. Na początku rozgrywki gracze na zmianę kładą swoje pionki na polach startowych. Ja będę rozwarzał pozycję startową trójkąt, koło, romb, kwadrat, romb, koło, kwadrat, trójkąt
+
+Zamiast zasady 11, na początku rozgrywki każdy z graczy miał już gotową, ustaloną z góry pozycję 
