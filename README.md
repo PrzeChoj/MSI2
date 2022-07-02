@@ -25,18 +25,25 @@ The script `solve_multiple_problem.py` has some parameters. One can inspect them
 
 In the Report, the script was executed with `max_time=300` and `number_of_repetitions=11`, which results with approximately 16 and a half hours of computing (300 seconds * 11 number\_of\_repetitions * 6 datasets * 3 modifictions = 16.5 hours).
 
-## Projekt 2 - Zastosowanie Upper Confidence Bound Applied To Trees do stworzenia sztucznej inteligencji grającej w Taifho dla dwóch graczy
+## Projekt 2 - Zastosowanie Upper Confidence Bound Applied To Trees do stworzenia sztucznej inteligencji grającej w grę Taifho dla dwóch graczy
 
-1. We can gen into the same board in 2 different way. Should we remember this after the move?
-2. Shold we select moves uniformly? Or maybe we will prefer those that leads to pawns being further?
-
-### Jak zagrać z SI?
+### Jak zagrać z AI?
 1. Pobierz to repozytorium
-2. Przejdź do folderu `project2/src/Taifho`
+2. Przejdź w Terminalu do folderu `project2/src/Taifho`
 3. W Terminalu wpisz komendę: `pip install .`
-4. Włącz interpreter Python albo za pomocą `jupyter notebook`, bądź komendą `python`.
-5. Zaimportuj zainstalowaną bibliotekę: `import Taifho`
-6. TODO(Co dalej?)
+4. Przejdź w Terminalu do folderu `project2/src/Game_py`
+5. W Terminalu wpisz komendę: `python main.py`
+6. Wybierz opcję "[1] Start Game!" przyciskiem "1"
+7. Wybierz algorytm MCTS oznaczony cyframi od 4 do 7. Cyfrą 1 oznaczono algorytm błądzenia losowego, ale cyframi 2 i 3 podstawowe wersje algorytmu MCTS, o których pokazano w raporcie, że nie działają.
+8. Można wybrać pozostałe parametry takie jak C, G, steps, ale można zostawić je jako bazowe klikając przycisk enter
+9. Wybierz którym kolorem chcesz grać. Zielony zaczyna (jak biały w szachach)
+10. W każdym ruchu wybierz, którą bierką chcesz się ruszyć (można zmienić swój wybór) np. D9 (można używać zarówno dużych jak i małych liter do oznaczenia pozycji)
+11. Na planszy znakiem * pokazane zostały pola na które wybrana bierka może się ruszyć
+12. Zaakceptuj wybór bierki przyciskiem enter, bądź zmień bierkę przyciskiem 1
+13. Po wybraniu i zaakceptowaniu bierki, wybierz pozycję na którą chcesz ruszyć się bierką (jedna z tych oznaczonych gwiazdką)
+14. Poczekaj, aż przeciwnik wykona swój ruch. Trwa to tyle, ile czasu zostało mu dane (domyślnie 10 sekund)
+15. Znów wykonaj zwój ruch tak, jak od punktu 10
+16. Jak gra się zakończy, to zdecyduj, czy chcesz zagrać jeszcze raz (być może z innymi parametrami) czy już chcesz zakończyć grę. W drugim przypadku wybierz opcję "[q] Quit"
 
 Pozycja startowa:
 

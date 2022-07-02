@@ -23,7 +23,7 @@ position.moves_made = 20
 
 position.draw_board()
 
-engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="UCT", steps=2)
+engine_mcts = MCTS_with_heuristic_h(C=math.sqrt(2), selection_type="UCT", steps=6)
 
 max_time = 60  # TODO(Edit here)
 num_of_rollouts = 0
