@@ -11,17 +11,18 @@ C_h$C_value <- C_h$C_value %>% as.numeric()
 C_h %>% group_by(C_value) %>% summarise(a = mean(moves_made, na.rm = TRUE))
 
 C_h %>% 
-  ggplot(aes(x=C_value, y=moves_made, color=factor(C_value))) +
+  ggplot(aes(x=C_value, y=moves_made, color=factor(C_value),
+             fill=factor(C_value), alpha=0.3)) +
   geom_violin(na.rm = TRUE, bw=10) +  # TODO uswalic wartosc bw. 10?
-  labs(title = "Liczba ruchów potrzebna algorytmowi MCTS do pokonania",
-       subtitle = "losowo poruszającego się przeciwnika w zależności od parametru G",
+  labs(title = "Liczba ruchów w zależności od parametru C",
+       subtitle = "którą potrzebował algorytm MCTS do pokonania losowo poruszającego się przeciwnika",
        x = "Wartosć parametru C",
        y = "Liczba ruchów do zwycięstwa") +
   scale_x_continuous(breaks = c(1, 1.41, 2, 3.5, 5),
                      labels = c("1", parse(text = TeX("$sqrt(2)$")), "2", "3.5", "5")) +
   stat_summary(fun = "mean", geom = "crossbar", width = 0.2) +
   theme_bw() +
-  guides(color = "none")
+  guides(color = "none", fill = "none", alpha = "none")
 
 
 
@@ -36,16 +37,17 @@ C_h_G %>% group_by(G_value) %>%
   arrange(G_value)
 
 C_h_G %>% 
-  ggplot(aes(x=G_value, y=moves_made, color=factor(G_value))) +
+  ggplot(aes(x=G_value, y=moves_made, color=factor(G_value),
+             fill=factor(G_value), alpha=0.3)) +
   geom_violin(na.rm = TRUE, bw=5) +  # TODO uswalic wartosc bw. 10?
-  labs(title = "Liczba ruchów potrzebna algorytmowi MCTS do pokonania",
-       subtitle = "losowo poruszającego się przeciwnika w zależności od parametru G",
+  labs(title = "Liczba ruchów w zależności od parametru G",
+       subtitle = "którą potrzebował algorytm MCTS do pokonania losowo poruszającego się przeciwnika",
        x = "Wartosć parametru G",
        y = "Liczba ruchów do zwycięstwa") +
   scale_x_continuous(breaks = c(1.1, 2, 3.5, 5, 7, 10, 20)) +
   stat_summary(fun = "mean", geom = "crossbar", width = 0.5) +
   theme_bw() +
-  guides(color = "none")
+  guides(color = "none", fill = "none", alpha = "none")
 
 
 
